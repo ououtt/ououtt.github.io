@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-12T12:28:18.594Z</updated>
+  <updated>2018-04-12T12:49:22.314Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,13 +17,169 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>reflection</title>
+    <link href="http://yoursite.com/2018/04/12/reflection/"/>
+    <id>http://yoursite.com/2018/04/12/reflection/</id>
+    <published>2018-04-12T12:48:52.000Z</published>
+    <updated>2018-04-12T12:49:22.314Z</updated>
+    
+    <content type="html"><![CDATA[<ul><li>在运行中分析类的能力。</li><li>在运行中查看对象，例如，编写一个toString方法供所有类使用。</li><li>实现数组的操作代码。</li><li>利用Method对象，这个对象很像C++中的函数指针。</li></ul><p>-<br>Class.forName</p><p>Class.getName</p><p>int.class</p><p>Class.newInstance/Constructor.newInstance</p><p>-<br>AccessibleObject<br>Filed Method Constructor</p><p>getModifiers方法返回整形数值，用不同的位开关描述public和static这样的修饰符使用状况，可以使用Modifier类的静态方法分析返回的整形数值。另外，还可以利用Modifier.toString方法将修饰法打印出来。</p><p>Class类中的getFields、getMethods和getConstructors方法将分别返回类提供的public域、方法和构造器数组，其中包括超类的公有成员。Class类的getDeclareFields、getDeclareMethods和<br>getDeclaredConstructors方法将分别返回类中声明的全部域、方法和构造器，其中包括私有和受保护成员，但不包括超类的成员。</p><p>setAccessible方法可以覆盖访问控制</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;ul&gt;
+&lt;li&gt;在运行中分析类的能力。&lt;/li&gt;
+&lt;li&gt;在运行中查看对象，例如，编写一个toString方法供所有类使用。&lt;/li&gt;
+&lt;li&gt;实现数组的操作代码。&lt;/li&gt;
+&lt;li&gt;利用Method对象，这个对象很像C++中的函数指针。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;-&lt;br&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>equals</title>
+    <link href="http://yoursite.com/2018/04/12/equals/"/>
+    <id>http://yoursite.com/2018/04/12/equals/</id>
+    <published>2018-04-12T12:47:38.000Z</published>
+    <updated>2018-04-12T12:48:13.726Z</updated>
+    
+    <content type="html"><![CDATA[<ol><li>自反性：对于任何非空引用x，x.equals(x) 应该返回true。</li><li>对称性：对于任何引用x和y，当且仅当y.equals(x)返回true，x.equals(y)也应该返回true。</li><li>传递性：对于任何引用x、y和z，如果x.equals(y)返回true，y.equals(z)返回true，x.equals(z) 也应该返回true。</li><li>一致性：如果x和y引用的对象没有发生变化，反复调用x.equals(y) 应该返回同样的结果。</li><li>对于任意非空引用x，x.equals(null) 应该返回false。</li></ol><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span> == obj) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (obj.getClass() != <span class="keyword">this</span>.getClass()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">//类型转化并判断属性是否相等</span></span><br><span class="line">    Test t = (Test) obj;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>注意是class对象是否相等，如果是使用<code>instanceof</code>关键字的话，子类对象和父类对象不满足对称性，详细：</p><ul><li>如果子类能够拥有自己的相等概念，则对称性需求将强制采用getClass进行检测。</li><li>如果由超类决定相等的概念，那么就可以使用instanceof进行检测，这样可以在不同子类的对象之间进行相等的比较，并且最好定义为final方法。</li></ul><p>如果在子类中重新定义equals，就要在其中包含调用super.equals(other)。</p><p>Equals与hashCode的定义必须一致：如果x.equals(y)返回true，那么x.hashCode( )就必须与y.hashCode( )具有相同的值。</p><p>如果存在数组类型的域，那么可以使用静态的Arrays.hashCode方法计算一个散列码，这个散列码由数组元素的散列码组成。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;ol&gt;
+&lt;li&gt;自反性：对于任何非空引用x，x.equals(x) 应该返回true。&lt;/li&gt;
+&lt;li&gt;对称性：对于任何引用x和y，当且仅当y.equals(x)返回true，x.equals(y)也应该返回true。&lt;/li&gt;
+&lt;li&gt;传递性：对于任何引用x、y和z，如果x
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>enum</title>
+    <link href="http://yoursite.com/2018/04/12/enum/"/>
+    <id>http://yoursite.com/2018/04/12/enum/</id>
+    <published>2018-04-12T12:47:09.000Z</published>
+    <updated>2018-04-12T12:47:27.309Z</updated>
+    
+    <content type="html"><![CDATA[<ul><li><p>枚举可以通过==判断相等</p></li><li><p>枚举的toString方法返回枚举常量名，Enum.valueOf是toString的逆方法</p></li><li><p>每个枚举类型都有一个静态的values方法，返回包含全部枚举值的数组</p></li><li><p>ordinal方法返回枚举常量的位置，从0开始计数</p></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;ul&gt;
+&lt;li&gt;&lt;p&gt;枚举可以通过==判断相等&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;枚举的toString方法返回枚举常量名，Enum.valueOf是toString的逆方法&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;每个枚举类型都有一个静态的values方法，返回包含全部枚举值的数组
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>collection</title>
+    <link href="http://yoursite.com/2018/04/12/collection/"/>
+    <id>http://yoursite.com/2018/04/12/collection/</id>
+    <published>2018-04-12T12:46:41.000Z</published>
+    <updated>2018-04-12T12:46:57.253Z</updated>
+    
+    <content type="html"><![CDATA[<p>queue队列实现：循环数组和链表</p><p>remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Iterator it = list.iterator();</span><br><span class="line">it.next();</span><br><span class="line">it.remove();</span><br><span class="line">it.next();</span><br><span class="line">it.remove();</span><br></pre></td></tr></table></figure><p>WeakHashMap只有映射表本身持有某个键值的时候，会将键值存入队列，WeakHashMap周期性检查队列删除对应条目。</p><p>LinkedHashSet和LinkedHashMap记住了存放顺序，在值上添加了双向链表。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">```Collections.singleton</span><br></pre></td></tr></table></figure><p>不可修改的视图：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Collections.unmodifiableCollection</span><br><span class="line">Collections.unmodifiableList</span><br><span class="line">Collections.unmodifiableSet</span><br><span class="line">Collections.unmodifiableSortedSet</span><br><span class="line">Collections.unmodifiableMap</span><br><span class="line">Collections.unmodifiableSortedMap</span><br></pre></td></tr></table></figure><p>Collections类的静态synchronizedMap方法可以将任何一个映射表转换成具有同步访问方法的Map;list同理</p><p>二分查找只有在支持随机访问的数据结构上才有意义，如果是一个链表，将会每一次都遍历一半元素来找到中间位置，二分查找就失去了优势。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;queue队列实现：循环数组和链表&lt;/p&gt;
+&lt;p&gt;remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutte
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>知识点</title>
+    <link href="http://yoursite.com/2018/04/12/%E7%9F%A5%E8%AF%86%E7%82%B9/"/>
+    <id>http://yoursite.com/2018/04/12/知识点/</id>
+    <published>2018-04-12T12:45:58.000Z</published>
+    <updated>2018-04-12T12:46:22.063Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="编辑运行命令"><a href="#编辑运行命令" class="headerlink" title="编辑运行命令"></a>编辑运行命令</h2><p>javac Test.java</p><p>java Test</p><h2 id="基础类型-primitive-type"><a href="#基础类型-primitive-type" class="headerlink" title="基础类型(primitive type)"></a>基础类型(primitive type)</h2><p>byte short int long 对应字节数：1，2，4，8</p><p>float double 对应字节数：4，8</p><p>char </p><p>boolean</p><p>Double.POSITIVE_INFINITY、Double.NEGATIVE_INFINITY和Double.NaN分别表示无穷大、无穷小和非数(0/0)</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//is never true</span></span><br><span class="line"><span class="keyword">if</span> (x == Double.NaN)</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//正确判断方式</span></span><br><span class="line"><span class="keyword">if</span> (Double.isNaN(x))</span><br></pre></td></tr></table></figure><h2 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Character.isJavaIdentifierStart();<span class="comment">//判断该字符是否可以作为变量的开头</span></span><br><span class="line">Character.isJavaIdentifierPart();<span class="comment">//判断该字符是否可以作为变量的一部分</span></span><br></pre></td></tr></table></figure><h2 id="数值计算"><a href="#数值计算" class="headerlink" title="数值计算"></a>数值计算</h2><p>整型计算 /求商 %求余</p><p>数值计算的中间过程允许是扩展的精度，即超出字段的范围，最后的结尾进行截断成为对应字节数的长度</p><p><strong>strictfp</strong>关键字标记类或者方法，所有的运算都将使用严格的浮点计算</p><p>位计算符：&amp;（”与”）、|（”或”）、^（”异或”）、~（”非”）</p><p>>&gt;&gt;运算符将用0填充高位；&gt;&gt;运算符用符号位填充高位；没有&lt;&lt;&lt;运算符</p><p>对移位运算符右侧的参数需要进行模32的运算（除非左边的操作数是long类型，<br>在这种情况下需对右侧操作数模64）。例如，1 &lt;&lt; 35与1 &lt;&lt; 3是相同的。</p><p>如果得到一个完全可预测的结果比运行速度更重要的话，那么就应该使用StrictMath类。</p><p><img src="http://upload-images.jianshu.io/upload_images/10322707-be24eb28c6410678.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="数值类型之间的合法转换.png"></p><p>6个实心箭头，表示无信息丢失的转换；3个虚箭头，表示可能有精度损失<br>的转换</p><ul><li>如果两个操作数中有一个是double类型的，另一个操作数就会转换为double类型。</li><li>否则，如果其中一个操作数是float类型，另一个操作数将会转换为float类型。</li><li>否则，如果其中一个操作数是long类型，另一个操作数将会转换为long类型。</li><li>否则，两个操作数都将被转换为int类型。</li></ul><h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><p>length方法将返回采用UTF-16编码表示的给定字符串所需要的代码单元数量;要想得到实际的长度，即代码点数量，可以调用：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = s.codePointCount(<span class="number">0</span>, s.length());</span><br></pre></td></tr></table></figure><p>调用s.charAt(n) 将返回位置n的代码单元，n介于0～s.length()-1之间;要想得到第i个代码点，应该使用下列语句:</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> index = s.offsetByCodePoints(<span class="number">0</span>, i);</span><br><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br></pre></td></tr></table></figure><p>如果想要遍历一个字符串，并且依次查看每一个代码点，可以使用下列语句：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br><span class="line"><span class="keyword">if</span> (Character.isSupplementaryCodePoint(cp)) i+=<span class="number">2</span>;</span><br><span class="line"><span class="keyword">else</span> i++;</span><br></pre></td></tr></table></figure><p>StringBuilder线程不安全；StringBuffer线程安全</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//数组</span></span><br><span class="line">Arrays.toString</span><br><span class="line">Arrays.deepToString</span><br></pre></td></tr></table></figure><h2 id="System-in"><a href="#System-in" class="headerlink" title="System.in"></a>System.in</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Scanner s = <span class="keyword">new</span> Scanner(System.in)</span><br></pre></td></tr></table></figure><p>因为输入是可见的，所以Scanner类不适用于从控制台读取密码。Java SE 6特别引<br>入了Console类实现这个目的。要想读取一个密码，可以采用下列代码(为了安全起见，返回的密码存放在一维字符数组中，而不是字符串中。在对密码进行处理之后，应该马上用一个填充值覆盖数组元素)：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注意只能控制台运行，idea无法得到console</span></span><br><span class="line">Console c = System.console();</span><br><span class="line">String username = c.readLine(<span class="string">"User name: "</span>);</span><br><span class="line"><span class="keyword">char</span>[] password = c.readPassword(<span class="string">"password: "</span>);</span><br></pre></td></tr></table></figure><h2 id="方法传参"><a href="#方法传参" class="headerlink" title="方法传参"></a>方法传参</h2><p>java都是值引用</p><ul><li>一个方法不能修改一个基本数据类型的参数（即数值型和布尔型）。</li><li>一个方法可以改变一个对象参数的状态。</li><li>一个方法不能实现让对象参数引用一个新的对象。</li></ul><h2 id="finalize"><a href="#finalize" class="headerlink" title="finalize"></a>finalize</h2><p>System.runFinalizersOnExit(true) 的方法能够确保finalizer方法在Java关闭<br>前被调用。不过，这个方法并不安全，也不鼓励大家使用。有一种代替的方法是使用方法<br>Runtime.addShutdownHook添加“关闭钩”（shutdown hook）</p><h2 id="数组克隆"><a href="#数组克隆" class="headerlink" title="数组克隆"></a>数组克隆</h2><p>所有的数组类型均包含一个clone方法，这个方法被设为public，而不是protected。可以利用这个方法创建一个包含所有数据元素拷贝的一个新数组。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;编辑运行命令&quot;&gt;&lt;a href=&quot;#编辑运行命令&quot; class=&quot;headerlink&quot; title=&quot;编辑运行命令&quot;&gt;&lt;/a&gt;编辑运行命令&lt;/h2&gt;&lt;p&gt;javac Test.java&lt;/p&gt;
+&lt;p&gt;java Test&lt;/p&gt;
+&lt;h2 id=&quot;基础类型-prim
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>泛型</title>
+    <link href="http://yoursite.com/2018/04/12/%E6%B3%9B%E5%9E%8B/"/>
+    <id>http://yoursite.com/2018/04/12/泛型/</id>
+    <published>2018-04-12T12:44:35.000Z</published>
+    <updated>2018-04-12T12:45:22.735Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pair</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T first;</span><br><span class="line">    <span class="keyword">private</span> T second;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Pair p = <span class="keyword">new</span> Pair();</span><br><span class="line">        Pair&lt;String&gt; p2 = <span class="keyword">new</span> Pair&lt;&gt;(<span class="string">"1"</span>, <span class="string">"2"</span>);</span><br><span class="line">        System.out.println(p2.getFirst());</span><br><span class="line">        System.out.println(p2.getSecond());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getMiddle</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Cloneable &amp; Serializable&gt; <span class="function">T <span class="title">clone</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure><p>限定类型用“&amp;”分隔，而逗号用来分隔类型变量。在Java的继承中，可以根据需要拥有多个接口超类型，但限定中至多有一个类。如果用一个类作为限定，它必须是限定列表中的第一个。</p><p>无论何时定义一个泛型类型，都自动提供了一个相应的原始类型（raw type）。原始类型的名字就是删去类型参数后的泛型类型名。擦除（erased）类型变量，并替换为限定类型（无限定的变量用Object)。</p><ul><li>虚拟机中没有泛型，只有普通的类和方法。</li><li>所有的类型参数都用它们的限定类型替换。</li><li>桥方法被合成来保持多态。</li><li>为保持类型安全性，必要时插入强制类型转换。</li></ul><p>不能抛出也不能捕获泛型类实例,泛型类扩展Throwable都不合法</p><p>参数化类型的数组不合法</p><p>不能实例化类型变量,不能使用像new T(…)</p><p>考虑一个类和一个子类，如Employee和Manager。Pair<manager>是Pair<employee>的一个子类吗？答案是“不是”。</employee></manager></p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//此方法不能接受Pair&lt;Manager&gt;参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;Emplyee&gt; p)</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">//可以接受泛型参数继承自Employee的所有参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;? extends Employee&gt; p)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function">extends Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? extends Employee)</span></span></span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function"><span class="keyword">super</span> Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? <span class="keyword">super</span> Employee)</span></span></span><br></pre></td></tr></table></figure><p>注意extends和super的区别:extends的get方法可以调用，但是set方法不行，get方法返回值即是父类引用指向子类对象的情况，set入参不能确定；super</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;泛型类&quot;&gt;&lt;a href=&quot;#泛型类&quot; class=&quot;headerlink&quot; title=&quot;泛型类&quot;&gt;&lt;/a&gt;泛型类&lt;/h3&gt;&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;sp
+      
+    
+    </summary>
+    
+    
+      <category term="java核心技术" scheme="http://yoursite.com/tags/java%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF/"/>
+    
+  </entry>
+  
+  <entry>
     <title>多线程</title>
     <link href="http://yoursite.com/2018/04/12/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
     <id>http://yoursite.com/2018/04/12/多线程/</id>
     <published>2018-04-12T12:27:10.000Z</published>
-    <updated>2018-04-12T12:28:18.594Z</updated>
+    <updated>2018-04-12T13:00:36.517Z</updated>
     
-    <content type="html"><![CDATA[<p>interrupt方法可以用来请求终止线程，当对一个线程调用interrupt方法时，线程的中断状态将被置位，这是每一个线程都具有的boolean标志，每个线程都应该不时检查这个标志，以判断线程是否被中断。<br>isInterrupted方法可以用来判断中断状态是否被置位。</p><p>但是，如果线程被阻塞，就无法检测中断状态。这是产生InterruptedException异常的地方。当<br>在一个被阻塞的线程（调用sleep或wait）上调用interrupt方法时，阻塞调用将会被Interrupted<br>Exception异常中断。</p><p>有两个非常类似的方法，interrupted和isInterrupted。Interrupted方法是一个静态方<br>法，它检测当前的线程是否被中断。而且，调用interrupted方法会清除该线程的中断状态。<br>另一方面，isInterrupted方法是一个实例方法，可用来检验是否有线程被中断。调用这个<br>方法不会改变中断状态。</p><blockquote><p>线程可以有如下6种状态：</p></blockquote><ul><li>New（新生)</li><li>Runnable（可运行）</li><li>Blocked（被阻塞）</li><li>Waiting（等待）</li><li>Timed waiting（计时等待）</li><li>Terminated（被终止）</li></ul><blockquote><p>要确定一个线程的当前状态，可调用getState方法。</p></blockquote><ul><li>新生线程<br>当一个线程处于新生状态时，线程还没有开始运行，还有一些薄记工作要做。</li><li>可运行线程<br>一旦调用start方法，线程处于runnable状态，可能运行也可能没有运行。抢占式调度系统给每一个可运行线程一个时间片来执行任务，当时间片用完，操作系统考虑线程的优先级来给另一个线程运行几乎。<br>像手机这样的小型设备可能使用协作式调度，一个线程只有在调用yield方法或者被阻塞或被等待时，线程才失去控制权。</li><li>当一个线程试图获取一个内部的对象锁（而不是java.util.concurrent库中的锁），而该所被其他线程持有时，则进入阻塞状态。</li><li>当线程等待另一个线程通知调度器一个条件时，进入等待状态。Object.wait或者Thread.join，或者是等待java.util.concurrent库中的Lock或Condition。</li><li>Thread.sleep,Object.wait,Thread.join,Lock.tryLock以及Condition.await的记时板，调用这些方法导致线程进入记时等待，这个状态将一直保持到超时期满或者接受到适当的通知。</li><li>run方法正常退出而自然死亡；因为一个没有捕获的异常终止了run方法而意外死亡。</li></ul><h2 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h2><ul><li>线程的优先级<br>默认情况下，一个线程集成它的父线程的优先级，setPriority设置优先级。但是优先级是依赖于宿主机的，例如windows只有7个优先级，因此不要将程序依赖于优先级。</li><li>守护线程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">线程的run方法不能抛出任何被检测的异常, 但是，不被检测的异常会导致线程终止。在这种情况下，线程就死亡了。</span><br><span class="line">但是，不需要任何catch子句来处理可以被传播的异常。相反，就在线程死亡之前，异常被传递到一个用于未捕获异常的处理器。该处理器必须属于一个实现Thread.UncaughtExceptionHandler接口的类。这个接口只有一个方法。```void uncaughtException(Thread t, Throwable e)```从Java SE 5.0起, 可以用setUncaughtExceptionHandler方法为任何线程安装一个处理器。也可以用Thread类的静态方法setDefaultUncaughtExceptionHandler为所有线程安装一个默认的处理器。替换处理器可以使用日志API发送未捕获异常的报告到日志文件。如果不安装默认的处理器，默认的处理器为空。但是，如果不为独立的线程安装处理器，此时的处理器就是该线程的ThreadGroup对象。</span><br><span class="line"></span><br><span class="line">- ReentrantLock</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">lock.lock();</span><br><span class="line">try &#123;</span><br><span class="line">&#125; final &#123;</span><br><span class="line">lock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><p>锁是可重入的，锁保持一个持有计数(hold count)来跟踪对lock方法的嵌套调用。因此被保护的代码可以调用另一个使用相同锁的方法。</p><p>一个锁对象可以有一个或多个相关的条件对象，可以用newCondition方法获得一个条件对象，condition的await方法导致当前线程被阻塞，并放弃了锁，直到另一个线程调用了同一个条件的signalAll,等待该条件的所有线程继续去判断条件是否满足。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (...) &#123;</span><br><span class="line">    condition.await();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>object的wait和notifyAll等价于condition的awati和signalAll。使用synchronized关键字来编写代码要简洁得多，每一个对象有一个内部锁，并且该锁有一个内部条件。由锁来管理那些试图进入synchronized方法的线程，由条件来管理那些调用wait的线程。</p>]]></content>
+    <content type="html"><![CDATA[<p>interrupt方法可以用来请求终止线程，当对一个线程调用interrupt方法时，线程的中断状态将被置位，这是每一个线程都具有的boolean标志，每个线程都应该不时检查这个标志，以判断线程是否被中断。<br>isInterrupted方法可以用来判断中断状态是否被置位。</p><p>但是，如果线程被阻塞，就无法检测中断状态。这是产生InterruptedException异常的地方。当<br>在一个被阻塞的线程（调用sleep或wait）上调用interrupt方法时，阻塞调用将会被Interrupted<br>Exception异常中断。</p><p>有两个非常类似的方法，interrupted和isInterrupted。Interrupted方法是一个静态方<br>法，它检测当前的线程是否被中断。而且，调用interrupted方法会清除该线程的中断状态。<br>另一方面，isInterrupted方法是一个实例方法，可用来检验是否有线程被中断。调用这个<br>方法不会改变中断状态。</p><blockquote><p>线程可以有如下6种状态：</p></blockquote><ul><li>New（新生)</li><li>Runnable（可运行）</li><li>Blocked（被阻塞）</li><li>Waiting（等待）</li><li>Timed waiting（计时等待）</li><li>Terminated（被终止）</li></ul><blockquote><p>要确定一个线程的当前状态，可调用getState方法。</p></blockquote><ul><li>新生线程<br>当一个线程处于新生状态时，线程还没有开始运行，还有一些薄记工作要做。</li><li>可运行线程<br>一旦调用start方法，线程处于runnable状态，可能运行也可能没有运行。抢占式调度系统给每一个可运行线程一个时间片来执行任务，当时间片用完，操作系统考虑线程的优先级来给另一个线程运行几乎。<br>像手机这样的小型设备可能使用协作式调度，一个线程只有在调用yield方法或者被阻塞或被等待时，线程才失去控制权。</li><li>当一个线程试图获取一个内部的对象锁（而不是java.util.concurrent库中的锁），而该所被其他线程持有时，则进入阻塞状态。</li><li>当线程等待另一个线程通知调度器一个条件时，进入等待状态。Object.wait或者Thread.join，或者是等待java.util.concurrent库中的Lock或Condition。</li><li>Thread.sleep,Object.wait,Thread.join,Lock.tryLock以及Condition.await的记时板，调用这些方法导致线程进入记时等待，这个状态将一直保持到超时期满或者接受到适当的通知。</li><li>run方法正常退出而自然死亡；因为一个没有捕获的异常终止了run方法而意外死亡。</li></ul><h2 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h2><ul><li>线程的优先级<br>默认情况下，一个线程集成它的父线程的优先级，setPriority设置优先级。但是优先级是依赖于宿主机的，例如windows只有7个优先级，因此不要将程序依赖于优先级。</li><li>守护线程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">线程的run方法不能抛出任何被检测的异常, 但是，不被检测的异常会导致线程终止。在这种情况下，线程就死亡了。</span><br><span class="line">但是，不需要任何catch子句来处理可以被传播的异常。相反，就在线程死亡之前，异常被传递到一个用于未捕获异常的处理器。该处理器必须属于一个实现Thread.UncaughtExceptionHandler接口的类。这个接口只有一个方法。</span><br><span class="line">```void uncaughtException(Thread t, Throwable e)</span><br></pre></td></tr></table></figure></li></ul><p>从Java SE 5.0起, 可以用setUncaughtExceptionHandler方法为任何线程安装一个处理器。也可以用Thread类的静态方法setDefaultUncaughtExceptionHandler为所有线程安装一个默认的处理器。替换处理器可以使用日志API发送未捕获异常的报告到日志文件。如果不安装默认的处理器，默认的处理器为空。但是，如果不为独立的线程安装处理器，此时的处理器就是该线程的ThreadGroup对象。</p><ul><li>ReentrantLock</li></ul><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lock.lock();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">&#125; <span class="keyword">final</span> &#123;</span><br><span class="line">lock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>锁是可重入的，锁保持一个持有计数(hold count)来跟踪对lock方法的嵌套调用。因此被保护的代码可以调用另一个使用相同锁的方法。</p><p>一个锁对象可以有一个或多个相关的条件对象，可以用newCondition方法获得一个条件对象，condition的await方法导致当前线程被阻塞，并放弃了锁，直到另一个线程调用了同一个条件的signalAll,等待该条件的所有线程继续去判断条件是否满足。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (...) &#123;</span><br><span class="line">    condition.await();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>object的wait和notifyAll等价于condition的awati和signalAll。使用synchronized关键字来编写代码要简洁得多，每一个对象有一个内部锁，并且该锁有一个内部条件。由锁来管理那些试图进入synchronized方法的线程，由条件来管理那些调用wait的线程。</p><p><img src="/2018/04/12/多线程/thread.png" alt="thread"></p>]]></content>
     
     <summary type="html">
     
@@ -44,7 +200,7 @@
     <link href="http://yoursite.com/2018/04/11/ClassLoader/"/>
     <id>http://yoursite.com/2018/04/11/ClassLoader/</id>
     <published>2018-04-11T09:14:50.000Z</published>
-    <updated>2018-04-11T09:15:02.468Z</updated>
+    <updated>2018-04-12T12:40:10.565Z</updated>
     
     <content type="html"><![CDATA[<p>ClassLoader的具体作用就是将class文件加载到jvm虚拟机中，但是，jvm启动的时候，并不会一次性加载所有的class文件，而是根据需要去动态加载。</p><ol><li><p>BootstrapClassLoader</p><p> 最顶层的加载类，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。另外需要注意的是可以通过启动jvm时指定-Xbootclasspath和路径来改变Bootstrap ClassLoader的加载目录。比如java -Xbootclasspath/a:path被指定的文件追加到默认的bootstrap路径中;-Xbootclasspath/p:path  让jvm优先于默认的bootstrap去加载path中指定的class。</p></li><li><p>ExtentionClassLoader</p><p> 扩展的类加载器，加载目录%JRE_HOME%\lib\ext目录下的jar包和class文件。还可以加载-D java.ext.dirs选项指定的目录。</p></li><li><p>AppClassLoader(SystemClassLoader)</p><p> 加载当前应用的classpath的所有类。</p></li></ol><h2 id="sun-misc-Launcher"><a href="#sun-misc-Launcher" class="headerlink" title="sun.misc.Launcher"></a>sun.misc.Launcher</h2><p>ExtClassLoader和AppClassLoader两个类定义在Launcher中。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Launcher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Create the extension class loader</span></span><br><span class="line">        ClassLoader extcl;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            extcl = ExtClassLoader.getExtClassLoader();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">"Could not create extension class loader"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Now create the class loader to use to launch the application</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            loader = AppClassLoader.getAppClassLoader(extcl);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">"Could not create application class loader"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置AppClassLoader为线程上下文类加载器</span></span><br><span class="line">        Thread.currentThread().setContextClassLoader(loader);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><p>其中可以看到ExtClassLoader被传入AppClassLoader的静态构造方法中，追踪该静态方法，可以看到最终传给了抽象父类ClassLoader的<figure class="highlight plain"><figcaption><span>final ClassLoader parent;```域。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 父加载器</span><br><span class="line"></span><br><span class="line">每个类加载器都有一个父加载器，通过getParent()方法可以获得。之前已经看到AppClassLoader的父加载器就是ExtClassLoader，但是没有看到ExtClassLoader的父加载器是什么。</span><br><span class="line"></span><br><span class="line">尝试一下打印ExtClassLoader的父加载器：</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">Test.class.getClassLoader().getParent().getParent();//null</span><br></pre></td></tr></table></figure></p><p>看到结果是null，这和在Launcher中源码看到的一样，确实没有传入一个父加载器。但是ExtClassLoader</p>]]></content>
     
@@ -93,7 +249,7 @@
     <link href="http://yoursite.com/2018/04/11/%E4%B8%80%E4%B8%AA%E6%9C%89%E8%B6%A3%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F/"/>
     <id>http://yoursite.com/2018/04/11/一个有趣的类加载顺序/</id>
     <published>2018-04-11T08:44:44.000Z</published>
-    <updated>2018-04-12T12:30:48.542Z</updated>
+    <updated>2018-04-12T12:40:56.722Z</updated>
     
     <content type="html"><![CDATA[<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        staticFunction();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> StaticTest st = <span class="keyword">new</span> StaticTest();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">"1"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(<span class="string">"2"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StaticTest() &#123;</span><br><span class="line">        System.out.println(<span class="string">"3"</span>);</span><br><span class="line">        System.out.println(<span class="string">"a="</span> + a + <span class="string">",b="</span> + b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"4"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">110</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> b = <span class="number">112</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>复制粘贴，在idea上一跑，先看看结果：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2</span><br><span class="line">3</span><br><span class="line">a=110,b=0</span><br><span class="line">1</span><br><span class="line">4</span><br></pre></td></tr></table></figure><p>仔细分析一下，加载StaticTest.class时，先按照顺序执行statis语句，但第一个statis语句是static StaticTest st = new StaticTest();,此时类还没加载完成，但是已经需要生成一个该类的对象，所以按照顺序执行非静态语句：打印2，给a赋值110，然后进入构造函数，打印3和a，b，注意b尚未被赋值，所以是初始化的值。然后才会执行余下的statis语句，打印2，给b赋值112，最后进入main方法打印4。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        staticFunction();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> StaticTest st = <span class="keyword">new</span> StaticTest();<span class="comment">//1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">"1"</span>);<span class="comment">//5</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(<span class="string">"2"</span>);<span class="comment">//2</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StaticTest() &#123;<span class="comment">//4</span></span><br><span class="line">        System.out.println(<span class="string">"3"</span>);</span><br><span class="line">        System.out.println(<span class="string">"a="</span> + a + <span class="string">",b="</span> + b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"4"</span>);<span class="comment">//6</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">110</span>;<span class="comment">//3</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> b = <span class="number">112</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
     
@@ -107,7 +263,7 @@
     </summary>
     
     
-      <category term="解决的问题" scheme="http://yoursite.com/tags/%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+      <category term="问题" scheme="http://yoursite.com/tags/%E9%97%AE%E9%A2%98/"/>
     
   </entry>
   
@@ -160,7 +316,7 @@
     <link href="http://yoursite.com/2018/04/03/%E8%AE%A1%E7%AE%97%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E6%AF%8F%E5%88%97%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/"/>
     <id>http://yoursite.com/2018/04/03/计算二维数组每列的最大值/</id>
     <published>2018-04-03T13:15:38.000Z</published>
-    <updated>2018-04-12T12:30:51.248Z</updated>
+    <updated>2018-04-12T12:40:53.746Z</updated>
     
     <content type="html"><![CDATA[<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[] maxIncol(<span class="keyword">int</span>[][] arr) &#123;</span><br><span class="line">  <span class="keyword">int</span>[] res = arr[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">int</span>[] temp;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;arr.length; i++) &#123;</span><br><span class="line">            temp = arr[i];</span><br><span class="line">            <span class="keyword">if</span> (res.length &lt; temp.length) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j=<span class="number">0</span>; j&lt;res.length; j++) &#123;</span><br><span class="line">                    temp[j] = Math.max(res[j], temp[j]);</span><br><span class="line">                &#125;</span><br><span class="line">                res = temp;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j=<span class="number">0</span>; j&lt;temp.length; j++) &#123;</span><br><span class="line">                    res[j] = Math.max(res[j], temp[j]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
     
@@ -174,7 +330,7 @@
     </summary>
     
     
-      <category term="解决的问题" scheme="http://yoursite.com/tags/%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+      <category term="问题" scheme="http://yoursite.com/tags/%E9%97%AE%E9%A2%98/"/>
     
   </entry>
   

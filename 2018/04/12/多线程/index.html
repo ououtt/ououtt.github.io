@@ -89,10 +89,12 @@
 <meta property="og:site_name" content="个人博客">
 <meta property="og:description" content="interrupt方法可以用来请求终止线程，当对一个线程调用interrupt方法时，线程的中断状态将被置位，这是每一个线程都具有的boolean标志，每个线程都应该不时检查这个标志，以判断线程是否被中断。isInterrupted方法可以用来判断中断状态是否被置位。 但是，如果线程被阻塞，就无法检测中断状态。这是产生InterruptedException异常的地方。当在一个被阻塞的线程（调用s">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-12T12:28:18.594Z">
+<meta property="og:image" content="http://yoursite.com/2018/04/12/多线程/thread.png">
+<meta property="og:updated_time" content="2018-04-12T13:00:36.517Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程">
 <meta name="twitter:description" content="interrupt方法可以用来请求终止线程，当对一个线程调用interrupt方法时，线程的中断状态将被置位，这是每一个线程都具有的boolean标志，每个线程都应该不时检查这个标志，以判断线程是否被中断。isInterrupted方法可以用来判断中断状态是否被置位。 但是，如果线程被阻塞，就无法检测中断状态。这是产生InterruptedException异常的地方。当在一个被阻塞的线程（调用s">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/12/多线程/thread.png">
 
 
 
@@ -209,16 +211,6 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
           </a>
         </li>
       
@@ -359,13 +351,19 @@
 </ul>
 <h2 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h2><ul>
 <li>线程的优先级<br>默认情况下，一个线程集成它的父线程的优先级，setPriority设置优先级。但是优先级是依赖于宿主机的，例如windows只有7个优先级，因此不要将程序依赖于优先级。</li>
-<li>守护线程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">线程的run方法不能抛出任何被检测的异常, 但是，不被检测的异常会导致线程终止。在这种情况下，线程就死亡了。</span><br><span class="line">但是，不需要任何catch子句来处理可以被传播的异常。相反，就在线程死亡之前，异常被传递到一个用于未捕获异常的处理器。该处理器必须属于一个实现Thread.UncaughtExceptionHandler接口的类。这个接口只有一个方法。```void uncaughtException(Thread t, Throwable e)```从Java SE 5.0起, 可以用setUncaughtExceptionHandler方法为任何线程安装一个处理器。也可以用Thread类的静态方法setDefaultUncaughtExceptionHandler为所有线程安装一个默认的处理器。替换处理器可以使用日志API发送未捕获异常的报告到日志文件。如果不安装默认的处理器，默认的处理器为空。但是，如果不为独立的线程安装处理器，此时的处理器就是该线程的ThreadGroup对象。</span><br><span class="line"></span><br><span class="line">- ReentrantLock</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">lock.lock();</span><br><span class="line">try &#123;</span><br><span class="line">&#125; final &#123;</span><br><span class="line">lock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li>守护线程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">线程的run方法不能抛出任何被检测的异常, 但是，不被检测的异常会导致线程终止。在这种情况下，线程就死亡了。</span><br><span class="line">但是，不需要任何catch子句来处理可以被传播的异常。相反，就在线程死亡之前，异常被传递到一个用于未捕获异常的处理器。该处理器必须属于一个实现Thread.UncaughtExceptionHandler接口的类。这个接口只有一个方法。</span><br><span class="line">```void uncaughtException(Thread t, Throwable e)</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
+<p>从Java SE 5.0起, 可以用setUncaughtExceptionHandler方法为任何线程安装一个处理器。也可以用Thread类的静态方法setDefaultUncaughtExceptionHandler为所有线程安装一个默认的处理器。替换处理器可以使用日志API发送未捕获异常的报告到日志文件。如果不安装默认的处理器，默认的处理器为空。但是，如果不为独立的线程安装处理器，此时的处理器就是该线程的ThreadGroup对象。</p>
+<ul>
+<li>ReentrantLock</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lock.lock();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">&#125; <span class="keyword">final</span> &#123;</span><br><span class="line">lock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>锁是可重入的，锁保持一个持有计数(hold count)来跟踪对lock方法的嵌套调用。因此被保护的代码可以调用另一个使用相同锁的方法。</p>
 <p>一个锁对象可以有一个或多个相关的条件对象，可以用newCondition方法获得一个条件对象，condition的await方法导致当前线程被阻塞，并放弃了锁，直到另一个线程调用了同一个条件的signalAll,等待该条件的所有线程继续去判断条件是否满足。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (...) &#123;</span><br><span class="line">    condition.await();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>object的wait和notifyAll等价于condition的awati和signalAll。使用synchronized关键字来编写代码要简洁得多，每一个对象有一个内部锁，并且该锁有一个内部条件。由锁来管理那些试图进入synchronized方法的线程，由条件来管理那些调用wait的线程。</p>
+<p><img src="/2018/04/12/多线程/thread.png" alt="thread"></p>
 
       
     </div>
@@ -405,6 +403,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/12/泛型/" rel="prev" title="泛型">
+                泛型 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -485,7 +487,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

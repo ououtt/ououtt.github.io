@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="java核心技术," />
 
 
 
@@ -81,17 +81,18 @@
 
 
 
-<meta name="description" content="ClassLoader的具体作用就是将class文件加载到jvm虚拟机中，但是，jvm启动的时候，并不会一次性加载所有的class文件，而是根据需要去动态加载。  BootstrapClassLoader  最顶层的加载类，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。另外需要注意的是可以通过启动jvm时指定-X">
+<meta name="description" content="泛型类1234567891011121314@Data@AllArgsConstructor@NoArgsConstructorpublic class Pair&amp;lt;T&amp;gt; &amp;#123;    private T first;    private T second;    public static void main(String[] args) &amp;#123;        Pair">
+<meta name="keywords" content="java核心技术">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ClassLoader">
-<meta property="og:url" content="http://yoursite.com/2018/04/11/ClassLoader/index.html">
+<meta property="og:title" content="泛型">
+<meta property="og:url" content="http://yoursite.com/2018/04/12/泛型/index.html">
 <meta property="og:site_name" content="个人博客">
-<meta property="og:description" content="ClassLoader的具体作用就是将class文件加载到jvm虚拟机中，但是，jvm启动的时候，并不会一次性加载所有的class文件，而是根据需要去动态加载。  BootstrapClassLoader  最顶层的加载类，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。另外需要注意的是可以通过启动jvm时指定-X">
+<meta property="og:description" content="泛型类1234567891011121314@Data@AllArgsConstructor@NoArgsConstructorpublic class Pair&amp;lt;T&amp;gt; &amp;#123;    private T first;    private T second;    public static void main(String[] args) &amp;#123;        Pair">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-12T12:40:10.565Z">
+<meta property="og:updated_time" content="2018-04-12T12:45:22.735Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ClassLoader">
-<meta name="twitter:description" content="ClassLoader的具体作用就是将class文件加载到jvm虚拟机中，但是，jvm启动的时候，并不会一次性加载所有的class文件，而是根据需要去动态加载。  BootstrapClassLoader  最顶层的加载类，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。另外需要注意的是可以通过启动jvm时指定-X">
+<meta name="twitter:title" content="泛型">
+<meta name="twitter:description" content="泛型类1234567891011121314@Data@AllArgsConstructor@NoArgsConstructorpublic class Pair&amp;lt;T&amp;gt; &amp;#123;    private T first;    private T second;    public static void main(String[] args) &amp;#123;        Pair">
 
 
 
@@ -121,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/11/ClassLoader/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/04/12/泛型/"/>
 
 
 
 
 
-  <title>ClassLoader | 个人博客</title>
+  <title>泛型 | 个人博客</title>
   
 
 
@@ -254,7 +255,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/ClassLoader/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/泛型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="gzm">
@@ -271,7 +272,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ClassLoader</h1>
+          <h1 class="post-title" itemprop="name headline">泛型</h1>
         
 
         <div class="post-meta">
@@ -283,8 +284,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T17:14:50+08:00">
-                2018-04-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:44:35+08:00">
+                2018-04-12
               </time>
             
 
@@ -321,22 +322,24 @@
       
 
       
-        <p>ClassLoader的具体作用就是将class文件加载到jvm虚拟机中，但是，jvm启动的时候，并不会一次性加载所有的class文件，而是根据需要去动态加载。</p>
-<ol>
-<li><p>BootstrapClassLoader</p>
-<p> 最顶层的加载类，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。另外需要注意的是可以通过启动jvm时指定-Xbootclasspath和路径来改变Bootstrap ClassLoader的加载目录。比如java -Xbootclasspath/a:path被指定的文件追加到默认的bootstrap路径中;-Xbootclasspath/p:path  让jvm优先于默认的bootstrap去加载path中指定的class。</p>
-</li>
-<li><p>ExtentionClassLoader</p>
-<p> 扩展的类加载器，加载目录%JRE_HOME%\lib\ext目录下的jar包和class文件。还可以加载-D java.ext.dirs选项指定的目录。</p>
-</li>
-<li><p>AppClassLoader(SystemClassLoader)</p>
-<p> 加载当前应用的classpath的所有类。</p>
-</li>
-</ol>
-<h2 id="sun-misc-Launcher"><a href="#sun-misc-Launcher" class="headerlink" title="sun.misc.Launcher"></a>sun.misc.Launcher</h2><p>ExtClassLoader和AppClassLoader两个类定义在Launcher中。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Launcher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Create the extension class loader</span></span><br><span class="line">        ClassLoader extcl;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            extcl = ExtClassLoader.getExtClassLoader();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">"Could not create extension class loader"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Now create the class loader to use to launch the application</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            loader = AppClassLoader.getAppClassLoader(extcl);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">"Could not create application class loader"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置AppClassLoader为线程上下文类加载器</span></span><br><span class="line">        Thread.currentThread().setContextClassLoader(loader);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>其中可以看到ExtClassLoader被传入AppClassLoader的静态构造方法中，追踪该静态方法，可以看到最终传给了抽象父类ClassLoader的<figure class="highlight plain"><figcaption><span>final ClassLoader parent;```域。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 父加载器</span><br><span class="line"></span><br><span class="line">每个类加载器都有一个父加载器，通过getParent()方法可以获得。之前已经看到AppClassLoader的父加载器就是ExtClassLoader，但是没有看到ExtClassLoader的父加载器是什么。</span><br><span class="line"></span><br><span class="line">尝试一下打印ExtClassLoader的父加载器：</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">Test.class.getClassLoader().getParent().getParent();//null</span><br></pre></td></tr></table></figure></p>
-<p>看到结果是null，这和在Launcher中源码看到的一样，确实没有传入一个父加载器。但是ExtClassLoader</p>
+        <h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pair</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T first;</span><br><span class="line">    <span class="keyword">private</span> T second;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Pair p = <span class="keyword">new</span> Pair();</span><br><span class="line">        Pair&lt;String&gt; p2 = <span class="keyword">new</span> Pair&lt;&gt;(<span class="string">"1"</span>, <span class="string">"2"</span>);</span><br><span class="line">        System.out.println(p2.getFirst());</span><br><span class="line">        System.out.println(p2.getSecond());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getMiddle</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Cloneable &amp; Serializable&gt; <span class="function">T <span class="title">clone</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>限定类型用“&amp;”分隔，而逗号用来分隔类型变量。在Java的继承中，可以根据需要拥有多个接口超类型，但限定中至多有一个类。如果用一个类作为限定，它必须是限定列表中的第一个。</p>
+<p>无论何时定义一个泛型类型，都自动提供了一个相应的原始类型（raw type）。原始类型的名字就是删去类型参数后的泛型类型名。擦除（erased）类型变量，并替换为限定类型（无限定的变量用Object)。</p>
+<ul>
+<li>虚拟机中没有泛型，只有普通的类和方法。</li>
+<li>所有的类型参数都用它们的限定类型替换。</li>
+<li>桥方法被合成来保持多态。</li>
+<li>为保持类型安全性，必要时插入强制类型转换。</li>
+</ul>
+<p>不能抛出也不能捕获泛型类实例,泛型类扩展Throwable都不合法</p>
+<p>参数化类型的数组不合法</p>
+<p>不能实例化类型变量,不能使用像new T(…)</p>
+<p>考虑一个类和一个子类，如Employee和Manager。Pair<manager>是Pair<employee>的一个子类吗？答案是“不是”。</employee></manager></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//此方法不能接受Pair&lt;Manager&gt;参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;Emplyee&gt; p)</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">//可以接受泛型参数继承自Employee的所有参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;? extends Employee&gt; p)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function">extends Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? extends Employee)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function"><span class="keyword">super</span> Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? <span class="keyword">super</span> Employee)</span></span></span><br></pre></td></tr></table></figure>
+<p>注意extends和super的区别:extends的get方法可以调用，但是set方法不行，get方法返回值即是父类引用指向子类对象的情况，set入参不能确定；super</p>
 
       
     </div>
@@ -352,6 +355,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/java核心技术/" rel="tag"># java核心技术</a>
+          
+        </div>
+      
 
       
       
@@ -361,8 +370,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/11/Java反射/" rel="next" title="Java反射">
-                <i class="fa fa-chevron-left"></i> Java反射
+              <a href="/2018/04/12/多线程/" rel="next" title="多线程">
+                <i class="fa fa-chevron-left"></i> 多线程
               </a>
             
           </div>
@@ -371,8 +380,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/04/12/多线程/" rel="prev" title="多线程">
-                多线程 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/04/12/知识点/" rel="prev" title="知识点">
+                知识点 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -507,7 +516,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sun-misc-Launcher"><span class="nav-number">1.</span> <span class="nav-text">sun.misc.Launcher</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型类"><span class="nav-number">1.</span> <span class="nav-text">泛型类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型方法"><span class="nav-number">2.</span> <span class="nav-text">泛型方法</span></a></li></ol></div>
             
 
           </div>
