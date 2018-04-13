@@ -338,7 +338,7 @@
 <p>-<br>AccessibleObject<br>Filed Method Constructor</p>
 <p>getModifiers方法返回整形数值，用不同的位开关描述public和static这样的修饰符使用状况，可以使用Modifier类的静态方法分析返回的整形数值。另外，还可以利用Modifier.toString方法将修饰法打印出来。</p>
 <p>Class类中的getFields、getMethods和getConstructors方法将分别返回类提供的public域、方法和构造器数组，其中包括超类的公有成员。Class类的getDeclareFields、getDeclareMethods和<br>getDeclaredConstructors方法将分别返回类中声明的全部域、方法和构造器，其中包括私有和受保护成员，但不包括超类的成员。</p>
-<p>setAccessible方法可以覆盖访问控制</p>
+<p>setAccessible方法可以覆盖访问控制(仅仅是跳过安全检查)</p>
 
           
         
@@ -868,7 +868,7 @@
 <p>>&gt;&gt;运算符将用0填充高位；&gt;&gt;运算符用符号位填充高位；没有&lt;&lt;&lt;运算符</p>
 <p>对移位运算符右侧的参数需要进行模32的运算（除非左边的操作数是long类型，<br>在这种情况下需对右侧操作数模64）。例如，1 &lt;&lt; 35与1 &lt;&lt; 3是相同的。</p>
 <p>如果得到一个完全可预测的结果比运行速度更重要的话，那么就应该使用StrictMath类。</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10322707-be24eb28c6410678.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="数值类型之间的合法转换.png"></p>
+<p><img src="/2018/04/12/知识点/精度.png" alt="数值类型之间的合法转换.png"></p>
 <p>6个实心箭头，表示无信息丢失的转换；3个虚箭头，表示可能有精度损失<br>的转换</p>
 <ul>
 <li>如果两个操作数中有一个是double类型的，另一个操作数就会转换为double类型。</li>
