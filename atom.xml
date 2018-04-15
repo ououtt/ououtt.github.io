@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-04-13T09:32:06.021Z</updated>
+  <updated>2018-04-15T06:51:14.353Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>java多线程介绍</title>
+    <link href="http://yoursite.com/2018/04/15/java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2018/04/15/java多线程介绍/</id>
+    <published>2018-04-15T05:10:06.000Z</published>
+    <updated>2018-04-15T06:51:14.353Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="概念介绍"><a href="#概念介绍" class="headerlink" title="概念介绍"></a>概念介绍</h1><h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>Process是程序运行的实例,向操作系统申请资源(内存空间和文件句柄)基本单位</p><figure class="highlight ps"><figcaption><span>-ef```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">## 线程</span></span><br><span class="line"></span><br><span class="line">Thread是进程中可独立执行的最小单位.一个进程可以包含多个线程,同一个进程中的所有线程共享该进程中的资源.线程所要完成的计算就被称为任务,特定的线程总是在执行着特定的任务.</span><br><span class="line"></span><br><span class="line"><span class="comment">## Thread</span></span><br><span class="line"></span><br><span class="line">java平台中创建一个线程就是创建一个Thread或其子类,线程的任务逻辑在thread的run方法中,由虚拟机直接调用.但是,首先要启动线程,对应thread的start方法,具体何时运行是由线程调度器(Scheduler)决定的.</span><br><span class="line"></span><br><span class="line">创建thread的两种方式:<span class="number">1</span>.继承thread并重写run方法 <span class="number">2</span>.实现Runnable接口在run方法中实现任务逻辑并传给thread的构造函数.</span><br><span class="line"></span><br><span class="line">线程的run方法结束(正常结束或者异常退出),内存对象也会被虚拟机回收.并且线程的start方法只能被调用一次,多次调用会返回IllegalThreadStateException.</span><br><span class="line"></span><br><span class="line">创建一个线程对象与其他对象不同的是,java虚拟机会为每个线程分配调用栈(Call Stack)所需的内存空间.调用栈用于跟踪java代码间的调用关系以及java对本地代码(Native Code)的调用,另外java平台的每个线程可能还有一个内核线程与之对应.</span><br><span class="line"></span><br><span class="line">```Thread.currentThread()``` - 返回当前线程</span><br><span class="line"></span><br><span class="line"><span class="comment">## Runnable</span></span><br><span class="line"></span><br><span class="line">Thread是Runnable接口的一个实现类,重写的run方法如下:</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">@Override</span><br><span class="line">public void run() &#123;</span><br><span class="line">    <span class="keyword">if</span> (target != null) &#123;</span><br><span class="line">        target.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>其中,target是一个Runnable对象,第二个创建线程的方法会把构造函数传入的Runnable对象用target保存起来.</p><p>由于java是单继承的,并且组合也比继承更灵活,因此一般而言,使用第二种创建线程的方法.</p><p><code>Runtime.getRuntime.availableProcessors()</code> - 获取处理器个数</p><h2 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h2><p>线程的编号(ID),名称(name),线程的类别(Daemon)和优先级(Priority).</p><ul><li>ID</li></ul><p>long,用于标识不同的线程,该属性在运行结束后可能被后续创建的线程使用</p><ul><li>name</li></ul><p>String,面向用户的一个属性,不保证唯一.</p><ul><li>Deamon</li></ul><p>boolean,true表示为守护线程,该属性的默认值与父线程相同,且必须在start方法之前设置.用户线程会阻止虚拟机的正常停止,即有用户线程在运行时,虚拟机不会正常停止,但是守护线程不会影响java虚拟机的正常停止,用于执行一些重要性不是很高的任务.</p><p>java虚拟机的正常停止指不是通过System.exit也不是通过强制终止进程(kill).</p><ul><li>Priority</li></ul><p>int,java定义了1-10的10个优先级,默认值为5(表示普通优先级).对于具体的一个线程而言,其优先级的默认值和父线程相同.该值设置不当会产生线程饥饿(Thread Starvation).</p><h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><p><code>static Thread currentThread()</code> - 返回当前线程</p><p><code>void run()</code> - 线程任务逻辑代码</p><p><code>void start()</code> - 启动相应线程,不保证已经被启动和一定会启动</p><p><code>void join()</code> - 等待相应线程运行结束,若A线程调用<strong><em>B</em></strong>线程的join方法,那么线程A会暂停直到B线程运行结束</p><p><code>static void yield()</code> - 使当前线程主动放弃其对处理器的占用,该方法被调用时当前线程可能仍然继续运行</p><p><code>static void sleep(long millis)</code> - 休眠指定的时间</p><h2 id="线程的层次关系"><a href="#线程的层次关系" class="headerlink" title="线程的层次关系"></a>线程的层次关系</h2><p>父子关系:创建线程的当前线程是被创建的线程的父线程.</p><h2 id="java-lang-Thread-State-enum"><a href="#java-lang-Thread-State-enum" class="headerlink" title="java.lang.Thread.State(enum)"></a>java.lang.Thread.State(enum)</h2><p>可以通过Thread.getState()获取.</p><ul><li>new</li></ul><p>一个已经创建但是未启动的线程处于该状态,一个线程只可能有一次处于该状态</p><ul><li>runnable</li></ul><p>包括两个子状态:ready和running.ready表示可以被线程调度器调度而进入running状态,也被称为活跃线程.running表示正在运行,调用yield方法可能会转换为ready.</p><ul><li>blocked</li></ul><p>一个线程发起一个阻塞式io或者申请一个已经被其他线程持有的独占资源(锁),线程处于该状态,此时线程不会占用处理器资源,当io操作或者或者锁时,可以转化为runnable</p><ul><li>waiting</li></ul><p>使线程变为wating状态的方法:Object.wait(),Thread.join(),LockSupport.park(Object)</p><p>从waiting转化为runnable的方法:Object.notify()和notifyAll(),LockSupport.unpark(Object)</p><ul><li>timed_waiting</li></ul><p>和waiting的区别就是指定时间结束后,该线程会自动转化为runnable</p><ul><li>terminated</li></ul><p>结束运行的线程处于该状态,每个线程也只会有一次处于该状态</p><h2 id="jvisualvm"><a href="#jvisualvm" class="headerlink" title="jvisualvm"></a>jvisualvm</h2><p>java提供的jvm监视工具</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;概念介绍&quot;&gt;&lt;a href=&quot;#概念介绍&quot; class=&quot;headerlink&quot; title=&quot;概念介绍&quot;&gt;&lt;/a&gt;概念介绍&lt;/h1&gt;&lt;h2 id=&quot;进程&quot;&gt;&lt;a href=&quot;#进程&quot; class=&quot;headerlink&quot; title=&quot;进程&quot;&gt;&lt;/a&gt;进程&lt;/h
+      
+    
+    </summary>
+    
+    
+      <category term="java多线程" scheme="http://yoursite.com/tags/java%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>reflection</title>
