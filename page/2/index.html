@@ -254,6 +254,188 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/Java反射/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/11/Java反射/" itemprop="url">Java反射</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T17:11:35+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h2><ul>
+<li><p>获取类名</p>
+<ul>
+<li>getName</li>
+<li>getCanonicalName</li>
+<li><p>getSimpleName</p>
+<p>这里，getName()返回的是虚拟机里面的class的表示，而getCanonicalName()返回的是更容易理解的表示。其实对于大部分class来说这两个方法没有什么不同的。但是对于array，内部类，匿名内部类，lambda，代理类来说是有区别的。另外，类加载（虚拟机加载）的时候需要类的名字是getName。</p>
+<p>内部类示例：</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExternalClassConfig</span> </span>&#123;  </span><br><span class="line">      <span class="keyword">private</span> String desc;  </span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InternalConfig</span> </span>&#123;  </span><br><span class="line">      &#125;  </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用以下方法：</span></span><br><span class="line">ExternalClassConfig.class.getName()  <span class="comment">//my.ExternalClassConfig</span></span><br><span class="line">  ExternalClassConfig.class.getCanonicalName()  <span class="comment">//my.ExternalClassConfig</span></span><br><span class="line">  ExternalClassConfig.class.getSimpleName()  <span class="comment">//ExternalClassConfig</span></span><br><span class="line">    </span><br><span class="line">  InternalConfig.class.getName()  <span class="comment">//my.ExternalClassConfig$InternalConfig</span></span><br><span class="line"> InternalConfig.class.getCanonicalName()  <span class="comment">//my.ExternalClassConfig.InternalConfig</span></span><br><span class="line">  InternalConfig.class.getSimpleName() <span class="comment">//InternalConfig</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>  数组示例：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String [] ss = <span class="keyword">new</span> String[]&#123;  </span><br><span class="line">      <span class="string">"zw"</span>, <span class="string">"zz"</span>  </span><br><span class="line">  &#125;;  </span><br><span class="line">  <span class="comment">//‘[’ 表示数组，一个代表一维数组，比如 '[[' 代表二维数组。之后 'L' 代表类描述符，最后分号表示结束。这种编码叫做JNI字段描述符（JavaNative Interface FieldDescriptors)</span></span><br><span class="line">  ss.getClass().getName()  <span class="comment">// [Ljava.lang.String; </span></span><br><span class="line">  ss.getClass().getCanonicalName()  <span class="comment">// java.lang.String[]</span></span><br><span class="line">  ss.getClass().getSimpleName() <span class="comment">// String[]</span></span><br></pre></td></tr></table></figure>
+<p>  java动态代理类：com.sun.proxy.$Proxy0</p>
+<p>  匿名内部类：Test$1</p>
+<p>  lambda： $$Lambda$1</p>
+<h2 id="Constructor"><a href="#Constructor" class="headerlink" title="Constructor"></a>Constructor</h2><ul>
+<li>Java中新建对象的方法<ol>
+<li>new</li>
+<li>java.lang.Class#newInstance无参构造方法</li>
+<li>clone</li>
+<li>反序列化</li>
+<li>java.lang.reflect.Constructor#newInstance可以调用有参构造方法</li>
+</ol>
+</li>
+<li><p>得到构造函数</p>
+<ol>
+<li>getDeclaredConstructor：返回指定参数类型、所有声明的（包括private）构造函数</li>
+<li>getConstructor：返回指定参数类型、具有public访问权限的构造函数</li>
+<li>getDeclaredConstructors</li>
+<li>getConstructors</li>
+</ol>
+<p>可变参数例子(注意String[].class和强转为Object)：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VarConstructorTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">VarConstructorTest</span><span class="params">(String... strings)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"llll"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException </span>&#123;</span><br><span class="line">        Constructor&lt;VarConstructorTest&gt; constructor = VarConstructorTest.class.getDeclaredConstructor(String[].class);</span><br><span class="line">        VarConstructorTest varConstructorTest = constructor.newInstance((Object) <span class="keyword">new</span> String[]&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>内部类例子(注意和静态内部类不同)：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticNestedTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">NesteTest</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Constructor&lt;?&gt;[] constructors = NesteTest.class.getDeclaredConstructors();</span><br><span class="line">        <span class="keyword">for</span> (Constructor constructor : constructors) &#123;</span><br><span class="line">            <span class="comment">// reflect.StaticNestedTest$NesteTest(StaticNestedTest)</span></span><br><span class="line">            <span class="comment">// 内部类构造函数的第一个参数一定是指向外部类的对象</span></span><br><span class="line">            System.out.println(constructor);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Field"><a href="#Field" class="headerlink" title="Field"></a>Field</h2><ol>
+<li>getFields</li>
+<li>getField</li>
+<li>getDeclaredFields</li>
+<li>getDeclaredField</li>
+</ol>
+<p>declared代表本类，不包含父类域；没有declared则只能获得public域，但可以获得父类域。</p>
+<p>对对象的get/set方法以外。还有对基本类型的getBoolean/setBoolean,getInt/setInt,getDouble/setDouble等。</p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><ol>
+<li>getMethods</li>
+<li>getMethod</li>
+<li>getDeclaredMethods</li>
+<li>getDeclaredMethod</li>
+</ol>
+<p>可以通过invoke方法反射调用该方法。和Field一样，对私有方法的调用必须先通过setAccessible(true)设置访问权限。</p>
+<h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><h3 id="java-lang-reflect-Array"><a href="#java-lang-reflect-Array" class="headerlink" title="java.lang.reflect.Array"></a>java.lang.reflect.Array</h3><p>newInstance创建新数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String[] a = (String[]) Array.newInstance(String.class, <span class="number">10</span>);</span><br><span class="line">Array.set(a, <span class="number">0</span>, <span class="string">"test"</span>);</span><br><span class="line">(String)Array.get(a, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span>[][] b = (<span class="keyword">int</span>[][]) Array.newInstance(<span class="keyword">int</span>.class, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line"><span class="keyword">int</span>[][] c = (<span class="keyword">int</span>[][]) Array.newInstance(<span class="keyword">int</span>[].class, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="AccessibleObject"><a href="#AccessibleObject" class="headerlink" title="AccessibleObject"></a>AccessibleObject</h2><p>Field,Method和Constructor都继承自该接口，调用该接口的setAccessible可以设置访问权限。</p>
+<h2 id="ReflectiveOperationException"><a href="#ReflectiveOperationException" class="headerlink" title="ReflectiveOperationException"></a>ReflectiveOperationException</h2><p>反射操作抛出的异常父类，包括ClassNotFoundException，NoSuchFieldException，NoSuchMethodException，InvocationTargetException等。</p>
+<h2 id="Java动态代理"><a href="#Java动态代理" class="headerlink" title="Java动态代理"></a>Java动态代理</h2><p>动态代理可以在运行时动态实现多个接口，而不需要在源代码中通过implements关键词来声明。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TestInterface</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span>  <span class="title">test</span><span class="params">(String s)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyTest</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    TestInterface o;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ProxyTest</span><span class="params">(TestInterface o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.o = o;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"1"</span>);</span><br><span class="line">        Object result = method.invoke(o, args);</span><br><span class="line">        System.out.println(<span class="string">"2"</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TestInterface t = <span class="keyword">new</span> TestInterface() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">                System.out.println(s);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ProxyTest handler = <span class="keyword">new</span> ProxyTest(t);</span><br><span class="line">        TestInterface p = (TestInterface) Proxy.newProxyInstance(ProxyTest.class.getClassLoader(), <span class="keyword">new</span> Class[]&#123;TestInterface.class&#125;, handler);</span><br><span class="line">        p.test(<span class="string">"sss"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>InvocationHandler第一个参数proxy的使用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Account</span> </span>&#123;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Account <span class="title">deposit</span> <span class="params">(<span class="keyword">double</span> value)</span></span>;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">getBalance</span> <span class="params">()</span></span>;  </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> balance;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span> <span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"deposit"</span>.equals(method.getName())) &#123;  </span><br><span class="line">            Double value = (Double) args[<span class="number">0</span>];  </span><br><span class="line">            System.out.println(<span class="string">"deposit: "</span> + value);  </span><br><span class="line">            balance += value;  </span><br><span class="line">            <span class="keyword">return</span> proxy; </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"getBalance"</span>.equals(method.getName())) &#123;  </span><br><span class="line">            <span class="keyword">return</span> balance;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">Account account = (Account) Proxy.newProxyInstance(getClass().getClassLoader(), <span class="keyword">new</span> Class[] &#123;Account.class&#125;,  <span class="keyword">new</span> ExampleInvocationHandler());  </span><br><span class="line">account.deposit(<span class="number">5000</span>).deposit(<span class="number">4000</span>).deposit(-<span class="number">2500</span>);  </span><br><span class="line">System.out.println(<span class="string">"Balance: "</span> + account.getBalance());</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/一个有趣的类加载顺序/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -810,7 +992,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -823,7 +1005,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
