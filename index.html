@@ -254,6 +254,254 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/23/AbstractConfig/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/23/AbstractConfig/" itemprop="url">AbstractConfig</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-23T15:15:00+08:00">
+                2018-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="AbstractConfig"><a href="#AbstractConfig" class="headerlink" title="AbstractConfig"></a>AbstractConfig</h1><p>这是dubbo配置类的基类,dubbo中基本所有配置类都从该类继承(目前只有ArgumentConfig不是),该类只有id一个属性,因此主要是看一下它的一些静态方法.</p>
+<h2 id="关闭的钩子函数"><a href="#关闭的钩子函数" class="headerlink" title="关闭的钩子函数"></a>关闭的钩子函数</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (logger.isInfoEnabled()) &#123;</span><br><span class="line">                logger.info(<span class="string">"Run shutdown hook now."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            ProtocolConfig.destroyAll();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="string">"DubboShutdownHook"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>java原有提供finalize来作为对象回收时的调用的方法,但是早已不推荐使用(个人理解是jvm对象回收的原因),因此额外提供了Runtime.getRuntime().addShutdownHook来作为新的钩子函数,dubbo利用其调用了解析配置的destroyAll方法.</p>
+<h2 id="appendProperties"><a href="#appendProperties" class="headerlink" title="appendProperties"></a>appendProperties</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">appendProperties</span><span class="params">(AbstractConfig config)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (config == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//getTagName是将类名去掉后缀,dubbo配置累的后缀主要是Config,也有ReferenceBean这样的Bean结尾的</span></span><br><span class="line">    <span class="comment">//类名对应的配置标签前面加上dubbo.的通用前缀</span></span><br><span class="line">    String prefix = <span class="string">"dubbo."</span> + getTagName(config.getClass()) + <span class="string">"."</span>;</span><br><span class="line">    Method[] methods = config.getClass().getMethods();</span><br><span class="line">    <span class="comment">//遍历方法,找到set开头的,参数只有一个且是基本类型(包括基本类型的包装类和String,Object)的public方法</span></span><br><span class="line">    <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String name = method.getName();</span><br><span class="line">            <span class="keyword">if</span> (name.length() &gt; <span class="number">3</span> &amp;&amp; name.startsWith(<span class="string">"set"</span>) &amp;&amp; Modifier.isPublic(method.getModifiers())</span><br><span class="line">                    &amp;&amp; method.getParameterTypes().length == <span class="number">1</span> &amp;&amp; isPrimitive(method.getParameterTypes()[<span class="number">0</span>])) &#123;</span><br><span class="line">                <span class="comment">//驼峰方法名转化:AppleTree转化为apple.tree</span></span><br><span class="line">                String property = StringUtils.camelToSplitName(name.substring(<span class="number">3</span>, <span class="number">4</span>).toLowerCase() + name.substring(<span class="number">4</span>), <span class="string">"."</span>);</span><br><span class="line"></span><br><span class="line">                String value = <span class="keyword">null</span>;</span><br><span class="line">                <span class="comment">//拿到所有的id,因为配置类继承自AbstractConfig,因此基本都有id属性,把id配置到属性的前面</span></span><br><span class="line">                <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + config.getId() + <span class="string">"."</span> + property;</span><br><span class="line">                    value = System.getProperty(pn);<span class="comment">//从环境中拿</span></span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//如果没有指定了id的属性,那么就从环境中拿不指定id的属性,注意区分pn的不同</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + property;</span><br><span class="line">                    value = System.getProperty(pn);</span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//环境中没有,那么就调用相应get或is方法</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    Method getter;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        getter = config.getClass().getMethod(<span class="string">"get"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            getter = config.getClass().getMethod(<span class="string">"is"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (NoSuchMethodException e2) &#123;</span><br><span class="line">                            getter = <span class="keyword">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (getter != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (getter.invoke(config, <span class="keyword">new</span> Object[<span class="number">0</span>]) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + config.getId() + <span class="string">"."</span> + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                String legacyKey = legacyProperties.get(prefix + property);</span><br><span class="line">                                <span class="keyword">if</span> (legacyKey != <span class="keyword">null</span> &amp;&amp; legacyKey.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                    value = convertLegacyValue(legacyKey, ConfigUtils.getProperty(legacyKey));</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (value != <span class="keyword">null</span> &amp;&amp; value.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    method.invoke(config, <span class="keyword">new</span> Object[]&#123;convertPrimitive(method.getParameterTypes()[<span class="number">0</span>], value)&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(e.getMessage(), e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/spring配置解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/19/spring配置解析/" itemprop="url">spring配置解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T20:10:30+08:00">
+                2018-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="spring"><a href="#spring" class="headerlink" title="spring"></a>spring</h1><p>spring作为java开发使用最广的框架,dubbo当然做了支持,其实dubbo的支持就是通过spring的扩展实现的.</p>
+<h2 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h2><p>spring会加载classpath下的spring.handlers和spring.schemas文件,这两个文件分别申明了xml文件的解析器和xsd文件.其中xsd文件申明了xml文件可以有哪些元素,handler是对xml的解析类.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DubboNamespaceHandler</span> <span class="keyword">extends</span> <span class="title">NamespaceHandlerSupport</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="comment">//版本检查</span></span><br><span class="line">    Version.checkDuplicate(DubboNamespaceHandler.class);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"application"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ApplicationConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"module"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ModuleConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"registry"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(RegistryConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"monitor"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(MonitorConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"provider"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ProviderConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"consumer"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ConsumerConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"protocol"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ProtocolConfig.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"service"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ServiceBean.class, <span class="keyword">true</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"reference"</span>, <span class="keyword">new</span> DubboBeanDefinitionParser(ReferenceBean.class, <span class="keyword">false</span>));</span><br><span class="line">    registerBeanDefinitionParser(<span class="string">"annotation"</span>, <span class="keyword">new</span> AnnotationBeanDefinitionParser ());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到DubboNamespaceHandler的代码非常简单,继承的NamespaceHandlerSupport是spring提供的一个命名空间解析的支持类,然后在初始化方法中注册了application,module等标签名字以及对应的解析类.</p>
+<h2 id="DubboBeanDefinitionParser"><a href="#DubboBeanDefinitionParser" class="headerlink" title="DubboBeanDefinitionParser"></a>DubboBeanDefinitionParser</h2><p>DubboBeanDefinitionParser继承了BeanDefinitionParser接口,该接口负责解析xml成为BeanDefinition</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 解析xml得到RootBeanDefinition放入上下文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> element xml元素</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> parserContext 解析上下文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> beanClass 该xml对应的类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> required 是否需要</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> BeanDefinition <span class="title">parse</span><span class="params">(Element element, ParserContext parserContext, Class&lt;?&gt; beanClass, <span class="keyword">boolean</span> required)</span> </span>&#123;</span><br><span class="line">    RootBeanDefinition beanDefinition = <span class="keyword">new</span> RootBeanDefinition();</span><br><span class="line">    beanDefinition.setBeanClass(beanClass);</span><br><span class="line">    beanDefinition.setLazyInit(<span class="keyword">false</span>);</span><br><span class="line">    String id = element.getAttribute(<span class="string">"id"</span>);</span><br><span class="line">    <span class="keyword">if</span> ((id == <span class="keyword">null</span> || id.length() == <span class="number">0</span>) &amp;&amp; required) &#123;</span><br><span class="line">        <span class="comment">//没有声明id就先找name</span></span><br><span class="line">        String generatedBeanName = element.getAttribute(<span class="string">"name"</span>);</span><br><span class="line">        <span class="keyword">if</span> (generatedBeanName == <span class="keyword">null</span> || generatedBeanName.length() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//没有声明id和name就找interface,注意ProtocolConfig类型默认为dubbo,因为dubbo是protocol的spi默认值</span></span><br><span class="line">            <span class="keyword">if</span> (ProtocolConfig.class.equals(beanClass)) &#123;</span><br><span class="line">                generatedBeanName = <span class="string">"dubbo"</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                generatedBeanName = element.getAttribute(<span class="string">"interface"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//以上都没有就默认为类型的全类名</span></span><br><span class="line">        <span class="keyword">if</span> (generatedBeanName == <span class="keyword">null</span> || generatedBeanName.length() == <span class="number">0</span>) &#123;</span><br><span class="line">            generatedBeanName = beanClass.getName();</span><br><span class="line">        &#125;</span><br><span class="line">        id = generatedBeanName;</span><br><span class="line">        <span class="keyword">int</span> counter = <span class="number">2</span>;</span><br><span class="line">        <span class="comment">//如果该名字已经存在就加上后缀数字</span></span><br><span class="line">        <span class="keyword">while</span> (parserContext.getRegistry().containsBeanDefinition(id)) &#123;</span><br><span class="line">            id = generatedBeanName + (counter++);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (id != <span class="keyword">null</span> &amp;&amp; id.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (parserContext.getRegistry().containsBeanDefinition(id)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Duplicate spring bean id "</span> + id);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//在上下文中注册该bean,并在beanDefinition的属性中加入id</span></span><br><span class="line">        parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);</span><br><span class="line">        beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"id"</span>, id);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//协议类型的bean需要遍历所有bean找到属性名字为protocol类型是ProtocolConfig然后注入该bean</span></span><br><span class="line">    <span class="keyword">if</span> (ProtocolConfig.class.equals(beanClass)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (String name : parserContext.getRegistry().getBeanDefinitionNames()) &#123;</span><br><span class="line">            BeanDefinition definition = parserContext.getRegistry().getBeanDefinition(name);</span><br><span class="line">            PropertyValue property = definition.getPropertyValues().getPropertyValue(<span class="string">"protocol"</span>);</span><br><span class="line">            <span class="keyword">if</span> (property != <span class="keyword">null</span>) &#123;</span><br><span class="line">                Object value = property.getValue();</span><br><span class="line">                <span class="keyword">if</span> (value <span class="keyword">instanceof</span> ProtocolConfig &amp;&amp; id.equals(((ProtocolConfig) value).getName())) &#123;</span><br><span class="line">                    <span class="comment">//RuntimeBeanReference是Spring解析时的标注,表明该属性是一个其他的bean</span></span><br><span class="line">                    definition.getPropertyValues().addPropertyValue(<span class="string">"protocol"</span>, <span class="keyword">new</span> RuntimeBeanReference(id));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ServiceBean.class.equals(beanClass)) &#123;</span><br><span class="line">        String className = element.getAttribute(<span class="string">"class"</span>);</span><br><span class="line">        <span class="keyword">if</span> (className != <span class="keyword">null</span> &amp;&amp; className.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            RootBeanDefinition classDefinition = <span class="keyword">new</span> RootBeanDefinition();</span><br><span class="line">            classDefinition.setBeanClass(ReflectUtils.forName(className));</span><br><span class="line">            classDefinition.setLazyInit(<span class="keyword">false</span>);</span><br><span class="line">            parseProperties(element.getChildNodes(), classDefinition);</span><br><span class="line">            beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"ref"</span>, <span class="keyword">new</span> BeanDefinitionHolder(classDefinition, id + <span class="string">"Impl"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ProviderConfig.class.equals(beanClass)) &#123;</span><br><span class="line">        parseNested(element, parserContext, ServiceBean.class, <span class="keyword">true</span>, <span class="string">"service"</span>, <span class="string">"provider"</span>, id, beanDefinition);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ConsumerConfig.class.equals(beanClass)) &#123;</span><br><span class="line">        parseNested(element, parserContext, ReferenceBean.class, <span class="keyword">false</span>, <span class="string">"reference"</span>, <span class="string">"consumer"</span>, id, beanDefinition);</span><br><span class="line">    &#125;</span><br><span class="line">    Set&lt;String&gt; props = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    ManagedMap parameters = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (Method setter : beanClass.getMethods()) &#123;</span><br><span class="line">        String name = setter.getName();</span><br><span class="line">        <span class="keyword">if</span> (name.length() &gt; <span class="number">3</span> &amp;&amp; name.startsWith(<span class="string">"set"</span>)</span><br><span class="line">                &amp;&amp; Modifier.isPublic(setter.getModifiers())</span><br><span class="line">                &amp;&amp; setter.getParameterTypes().length == <span class="number">1</span>) &#123;</span><br><span class="line">            Class&lt;?&gt; type = setter.getParameterTypes()[<span class="number">0</span>];</span><br><span class="line">            String property = StringUtils.camelToSplitName(name.substring(<span class="number">3</span>, <span class="number">4</span>).toLowerCase() + name.substring(<span class="number">4</span>), <span class="string">"-"</span>);</span><br><span class="line">            props.add(property);</span><br><span class="line">            Method getter = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                getter = beanClass.getMethod(<span class="string">"get"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    getter = beanClass.getMethod(<span class="string">"is"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (NoSuchMethodException e2) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (getter == <span class="keyword">null</span></span><br><span class="line">                    || !Modifier.isPublic(getter.getModifiers())</span><br><span class="line">                    || !type.equals(getter.getReturnType())) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"parameters"</span>.equals(property)) &#123;</span><br><span class="line">                parameters = parseParameters(element.getChildNodes(), beanDefinition);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"methods"</span>.equals(property)) &#123;</span><br><span class="line">                parseMethods(id, element.getChildNodes(), beanDefinition, parserContext);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"arguments"</span>.equals(property)) &#123;</span><br><span class="line">                parseArguments(id, element.getChildNodes(), beanDefinition, parserContext);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                String value = element.getAttribute(property);</span><br><span class="line">                <span class="keyword">if</span> (value != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    value = value.trim();</span><br><span class="line">                    <span class="keyword">if</span> (value.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (<span class="string">"registry"</span>.equals(property) &amp;&amp; RegistryConfig.NO_AVAILABLE.equalsIgnoreCase(value)) &#123;</span><br><span class="line">                            RegistryConfig registryConfig = <span class="keyword">new</span> RegistryConfig();</span><br><span class="line">                            registryConfig.setAddress(RegistryConfig.NO_AVAILABLE);</span><br><span class="line">                            beanDefinition.getPropertyValues().addPropertyValue(property, registryConfig);</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"registry"</span>.equals(property) &amp;&amp; value.indexOf(<span class="string">','</span>) != -<span class="number">1</span>) &#123;</span><br><span class="line">                            parseMultiRef(<span class="string">"registries"</span>, value, beanDefinition, parserContext);</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"provider"</span>.equals(property) &amp;&amp; value.indexOf(<span class="string">','</span>) != -<span class="number">1</span>) &#123;</span><br><span class="line">                            parseMultiRef(<span class="string">"providers"</span>, value, beanDefinition, parserContext);</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"protocol"</span>.equals(property) &amp;&amp; value.indexOf(<span class="string">','</span>) != -<span class="number">1</span>) &#123;</span><br><span class="line">                            parseMultiRef(<span class="string">"protocols"</span>, value, beanDefinition, parserContext);</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            Object reference;</span><br><span class="line">                            <span class="keyword">if</span> (isPrimitive(type)) &#123;</span><br><span class="line">                                <span class="keyword">if</span> (<span class="string">"async"</span>.equals(property) &amp;&amp; <span class="string">"false"</span>.equals(value)</span><br><span class="line">                                        || <span class="string">"timeout"</span>.equals(property) &amp;&amp; <span class="string">"0"</span>.equals(value)</span><br><span class="line">                                        || <span class="string">"delay"</span>.equals(property) &amp;&amp; <span class="string">"0"</span>.equals(value)</span><br><span class="line">                                        || <span class="string">"version"</span>.equals(property) &amp;&amp; <span class="string">"0.0.0"</span>.equals(value)</span><br><span class="line">                                        || <span class="string">"stat"</span>.equals(property) &amp;&amp; <span class="string">"-1"</span>.equals(value)</span><br><span class="line">                                        || <span class="string">"reliable"</span>.equals(property) &amp;&amp; <span class="string">"false"</span>.equals(value)) &#123;</span><br><span class="line">                                    <span class="comment">// backward compatibility for the default value in old version's xsd</span></span><br><span class="line">                                    value = <span class="keyword">null</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                                reference = value;</span><br><span class="line">                            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"protocol"</span>.equals(property)</span><br><span class="line">                                    &amp;&amp; ExtensionLoader.getExtensionLoader(Protocol.class).hasExtension(value)</span><br><span class="line">                                    &amp;&amp; (!parserContext.getRegistry().containsBeanDefinition(value)</span><br><span class="line">                                    || !ProtocolConfig.class.getName().equals(parserContext.getRegistry().getBeanDefinition(value).getBeanClassName()))) &#123;</span><br><span class="line">                                <span class="keyword">if</span> (<span class="string">"dubbo:provider"</span>.equals(element.getTagName())) &#123;</span><br><span class="line">                                    logger.warn(<span class="string">"Recommended replace &lt;dubbo:provider protocol=\""</span> + value + <span class="string">"\" ... /&gt; to &lt;dubbo:protocol name=\""</span> + value + <span class="string">"\" ... /&gt;"</span>);</span><br><span class="line">                                &#125;</span><br><span class="line">                                <span class="comment">// backward compatibility</span></span><br><span class="line">                                ProtocolConfig protocol = <span class="keyword">new</span> ProtocolConfig();</span><br><span class="line">                                protocol.setName(value);</span><br><span class="line">                                reference = protocol;</span><br><span class="line">                            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"onreturn"</span>.equals(property)) &#123;</span><br><span class="line">                                <span class="keyword">int</span> index = value.lastIndexOf(<span class="string">"."</span>);</span><br><span class="line">                                String returnRef = value.substring(<span class="number">0</span>, index);</span><br><span class="line">                                String returnMethod = value.substring(index + <span class="number">1</span>);</span><br><span class="line">                                reference = <span class="keyword">new</span> RuntimeBeanReference(returnRef);</span><br><span class="line">                                beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"onreturnMethod"</span>, returnMethod);</span><br><span class="line">                            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"onthrow"</span>.equals(property)) &#123;</span><br><span class="line">                                <span class="keyword">int</span> index = value.lastIndexOf(<span class="string">"."</span>);</span><br><span class="line">                                String throwRef = value.substring(<span class="number">0</span>, index);</span><br><span class="line">                                String throwMethod = value.substring(index + <span class="number">1</span>);</span><br><span class="line">                                reference = <span class="keyword">new</span> RuntimeBeanReference(throwRef);</span><br><span class="line">                                beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"onthrowMethod"</span>, throwMethod);</span><br><span class="line">                            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"oninvoke"</span>.equals(property)) &#123;</span><br><span class="line">                                <span class="keyword">int</span> index = value.lastIndexOf(<span class="string">"."</span>);</span><br><span class="line">                                String invokeRef = value.substring(<span class="number">0</span>, index);</span><br><span class="line">                                String invokeRefMethod = value.substring(index + <span class="number">1</span>);</span><br><span class="line">                                reference = <span class="keyword">new</span> RuntimeBeanReference(invokeRef);</span><br><span class="line">                                beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"oninvokeMethod"</span>, invokeRefMethod);</span><br><span class="line">                            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                                <span class="keyword">if</span> (<span class="string">"ref"</span>.equals(property) &amp;&amp; parserContext.getRegistry().containsBeanDefinition(value)) &#123;</span><br><span class="line">                                    BeanDefinition refBean = parserContext.getRegistry().getBeanDefinition(value);</span><br><span class="line">                                    <span class="keyword">if</span> (!refBean.isSingleton()) &#123;</span><br><span class="line">                                        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The exported service ref "</span> + value + <span class="string">" must be singleton! Please set the "</span> + value + <span class="string">" bean scope to singleton, eg: &lt;bean id=\""</span> + value + <span class="string">"\" scope=\"singleton\" ...&gt;"</span>);</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                                reference = <span class="keyword">new</span> RuntimeBeanReference(value);</span><br><span class="line">                            &#125;</span><br><span class="line">                            beanDefinition.getPropertyValues().addPropertyValue(property, reference);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    NamedNodeMap attributes = element.getAttributes();</span><br><span class="line">    <span class="keyword">int</span> len = attributes.getLength();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">        Node node = attributes.item(i);</span><br><span class="line">        String name = node.getLocalName();</span><br><span class="line">        <span class="keyword">if</span> (!props.contains(name)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (parameters == <span class="keyword">null</span>) &#123;</span><br><span class="line">                parameters = <span class="keyword">new</span> ManagedMap();</span><br><span class="line">            &#125;</span><br><span class="line">            String value = node.getNodeValue();</span><br><span class="line">            parameters.put(name, <span class="keyword">new</span> TypedStringValue(value, String.class));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (parameters != <span class="keyword">null</span>) &#123;</span><br><span class="line">        beanDefinition.getPropertyValues().addPropertyValue(<span class="string">"parameters"</span>, parameters);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> beanDefinition;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/URL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1379,302 +1627,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/泛型/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/泛型/" itemprop="url">泛型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:44:35+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pair</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T first;</span><br><span class="line">    <span class="keyword">private</span> T second;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Pair p = <span class="keyword">new</span> Pair();</span><br><span class="line">        Pair&lt;String&gt; p2 = <span class="keyword">new</span> Pair&lt;&gt;(<span class="string">"1"</span>, <span class="string">"2"</span>);</span><br><span class="line">        System.out.println(p2.getFirst());</span><br><span class="line">        System.out.println(p2.getSecond());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getMiddle</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Cloneable &amp; Serializable&gt; <span class="function">T <span class="title">clone</span><span class="params">(T[] a)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>限定类型用“&amp;”分隔，而逗号用来分隔类型变量。在Java的继承中，可以根据需要拥有多个接口超类型，但限定中至多有一个类。如果用一个类作为限定，它必须是限定列表中的第一个。</p>
-<p>无论何时定义一个泛型类型，都自动提供了一个相应的原始类型（raw type）。原始类型的名字就是删去类型参数后的泛型类型名。擦除（erased）类型变量，并替换为限定类型（无限定的变量用Object)。</p>
-<ul>
-<li>虚拟机中没有泛型，只有普通的类和方法。</li>
-<li>所有的类型参数都用它们的限定类型替换。</li>
-<li>桥方法被合成来保持多态。</li>
-<li>为保持类型安全性，必要时插入强制类型转换。</li>
-</ul>
-<p>不能抛出也不能捕获泛型类实例,泛型类扩展Throwable都不合法</p>
-<p>参数化类型的数组不合法</p>
-<p>不能实例化类型变量,不能使用像new T(…)</p>
-<p>考虑一个类和一个子类，如Employee和Manager。Pair<manager>是Pair<employee>的一个子类吗？答案是“不是”。</employee></manager></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//此方法不能接受Pair&lt;Manager&gt;参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;Emplyee&gt; p)</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">//可以接受泛型参数继承自Employee的所有参数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(Pair&lt;? extends Employee&gt; p)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function">extends Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? extends Employee)</span></span></span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">? <span class="function"><span class="keyword">super</span> Employee <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(? <span class="keyword">super</span> Employee)</span></span></span><br></pre></td></tr></table></figure>
-<p>注意extends和super的区别:extends的get方法可以调用，但是set方法不行，get方法返回值即是父类引用指向子类对象的情况，set入参不能确定；super</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/多线程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/多线程/" itemprop="url">多线程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:27:10+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>interrupt方法可以用来请求终止线程，当对一个线程调用interrupt方法时，线程的中断状态将被置位，这是每一个线程都具有的boolean标志，每个线程都应该不时检查这个标志，以判断线程是否被中断。<br>isInterrupted方法可以用来判断中断状态是否被置位。</p>
-<p>但是，如果线程被阻塞，就无法检测中断状态。这是产生InterruptedException异常的地方。当<br>在一个被阻塞的线程（调用sleep或wait）上调用interrupt方法时，阻塞调用将会被Interrupted<br>Exception异常中断。</p>
-<p>有两个非常类似的方法，interrupted和isInterrupted。Interrupted方法是一个静态方<br>法，它检测当前的线程是否被中断。而且，调用interrupted方法会清除该线程的中断状态。<br>另一方面，isInterrupted方法是一个实例方法，可用来检验是否有线程被中断。调用这个<br>方法不会改变中断状态。</p>
-<blockquote>
-<p>线程可以有如下6种状态：</p>
-</blockquote>
-<ul>
-<li>New（新生)</li>
-<li>Runnable（可运行）</li>
-<li>Blocked（被阻塞）</li>
-<li>Waiting（等待）</li>
-<li>Timed waiting（计时等待）</li>
-<li>Terminated（被终止）</li>
-</ul>
-<blockquote>
-<p>要确定一个线程的当前状态，可调用getState方法。</p>
-</blockquote>
-<ul>
-<li>新生线程<br>当一个线程处于新生状态时，线程还没有开始运行，还有一些薄记工作要做。</li>
-<li>可运行线程<br>一旦调用start方法，线程处于runnable状态，可能运行也可能没有运行。抢占式调度系统给每一个可运行线程一个时间片来执行任务，当时间片用完，操作系统考虑线程的优先级来给另一个线程运行几乎。<br>像手机这样的小型设备可能使用协作式调度，一个线程只有在调用yield方法或者被阻塞或被等待时，线程才失去控制权。</li>
-<li>当一个线程试图获取一个内部的对象锁（而不是java.util.concurrent库中的锁），而该所被其他线程持有时，则进入阻塞状态。</li>
-<li>当线程等待另一个线程通知调度器一个条件时，进入等待状态。Object.wait或者Thread.join，或者是等待java.util.concurrent库中的Lock或Condition。</li>
-<li>Thread.sleep,Object.wait,Thread.join,Lock.tryLock以及Condition.await的记时板，调用这些方法导致线程进入记时等待，这个状态将一直保持到超时期满或者接受到适当的通知。</li>
-<li>run方法正常退出而自然死亡；因为一个没有捕获的异常终止了run方法而意外死亡。</li>
-</ul>
-<h2 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h2><ul>
-<li>线程的优先级<br>默认情况下，一个线程集成它的父线程的优先级，setPriority设置优先级。但是优先级是依赖于宿主机的，例如windows只有7个优先级，因此不要将程序依赖于优先级。</li>
-<li>守护线程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">线程的run方法不能抛出任何被检测的异常, 但是，不被检测的异常会导致线程终止。在这种情况下，线程就死亡了。</span><br><span class="line">但是，不需要任何catch子句来处理可以被传播的异常。相反，就在线程死亡之前，异常被传递到一个用于未捕获异常的处理器。该处理器必须属于一个实现Thread.UncaughtExceptionHandler接口的类。这个接口只有一个方法。</span><br><span class="line">```void uncaughtException(Thread t, Throwable e)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>从Java SE 5.0起, 可以用setUncaughtExceptionHandler方法为任何线程安装一个处理器。也可以用Thread类的静态方法setDefaultUncaughtExceptionHandler为所有线程安装一个默认的处理器。替换处理器可以使用日志API发送未捕获异常的报告到日志文件。如果不安装默认的处理器，默认的处理器为空。但是，如果不为独立的线程安装处理器，此时的处理器就是该线程的ThreadGroup对象。</p>
-<ul>
-<li>ReentrantLock</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lock.lock();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">&#125; <span class="keyword">final</span> &#123;</span><br><span class="line">lock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>锁是可重入的，锁保持一个持有计数(hold count)来跟踪对lock方法的嵌套调用。因此被保护的代码可以调用另一个使用相同锁的方法。</p>
-<p>一个锁对象可以有一个或多个相关的条件对象，可以用newCondition方法获得一个条件对象，condition的await方法导致当前线程被阻塞，并放弃了锁，直到另一个线程调用了同一个条件的signalAll,等待该条件的所有线程继续去判断条件是否满足。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (...) &#123;</span><br><span class="line">    condition.await();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>object的wait和notifyAll等价于condition的awati和signalAll。使用synchronized关键字来编写代码要简洁得多，每一个对象有一个内部锁，并且该锁有一个内部条件。由锁来管理那些试图进入synchronized方法的线程，由条件来管理那些调用wait的线程。</p>
-<p><img src="/2018/04/12/多线程/thread.png" alt="thread"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1729,7 +1681,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1742,7 +1694,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
