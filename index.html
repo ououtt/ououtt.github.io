@@ -254,6 +254,179 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/26/edas的测试路由/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/26/edas的测试路由/" itemprop="url">edas的测试路由</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-26T10:58:10+08:00">
+                2018-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="EDAS测试路由"><a href="#EDAS测试路由" class="headerlink" title="EDAS测试路由"></a>EDAS测试路由</h1><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>edas是一个分布式集群的治理工具,具有监控运维等功能.但是它只能内网ip调用,本地测试并不能调通需要的服务,如果只能发布到测试edas进行测试的话,这对开发效率是不利的,在联调阶段可能会需要频繁发布edas来测试功能.现在的目标就是推出一个路由方案,满足本地测试调用edas的接口.</p>
+<h2 id="方案一-版本区分"><a href="#方案一-版本区分" class="headerlink" title="方案一:版本区分"></a>方案一:版本区分</h2><p>配置edas环境的服务版本统一配置为1.0.0.daily.在ECS上同时发布一套镜像服务,该服务不使用edas治理并且版本统一为1.0.0.dev.本地测试版本统一为1.0.0.dev,因此本地只会调用ECS上的服务.注意ECS需要通过配置名DUBBO_IP_TO_BIND=(外网ip)来暴露本机的外网ip.</p>
+<p>缺点:需要发布两套服务,增加发布成本,浪费服务器资源.</p>
+<h2 id="方案二-版本路由"><a href="#方案二-版本路由" class="headerlink" title="方案二:版本路由"></a>方案二:版本路由</h2><p>EDAS环境统一1.0.0.daily版本,本地1.0.0.dev版本.路由吃所有的dubbo的api包,既作为消费者又作为提供者,只是消费者的版本是1.0.0.daily去消费edas上的服务,提供者的版本是1.0.0.dev接受本地的调用.</p>
+<p>配置文件示例:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:provider</span> <span class="attr">version</span>=<span class="string">"1.0.0.dev"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dubbo:consumer</span> <span class="attr">version</span>=<span class="string">"1.0.0.daily"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中所有的api实现方式是:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloProviderImpl</span> <span class="keyword">implements</span> <span class="title">HelloProvider</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Reference</span></span><br><span class="line">    HelloProvider helloProvider;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">say</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> helloProvider.say(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方案相对于第一个版本,虽然可以少发点应用,对机器资源有所减少,但是有编码成本,api包的变动也会需要重新发布路由,导致路由应用的频繁发布.</p>
+<h2 id="泛化调用"><a href="#泛化调用" class="headerlink" title="泛化调用"></a>泛化调用</h2><p>首先,必须确定路由是不会依赖相应的api包的,dubbo也提供了泛化调用可以通过字符串的形式调用相应服务和方法.查看dubbo的泛化服务的api:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GenericService</span> </span>&#123;</span><br><span class="line">    Object $invoke(String method, String[] parameterTypes, Object[] args) <span class="keyword">throws</span> GenericException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>路由调用也必须要有处理不同版本和分组的能力,因此可以确定路由的服务的api:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RouterProvider</span> </span>&#123;</span><br><span class="line">    <span class="function">Object <span class="title">trans</span><span class="params">(String interfaceName, String methodName, String[] parameterTypes, Object[] paramList, String group, String version)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来,问题就是如何通过编码的形式调用泛化服务:</p>
+<ol>
+<li><p>应用配置</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationConfig application = <span class="keyword">new</span> ApplicationConfig();</span><br><span class="line">application.setName(name);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注册中心配置</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RegistryConfig registryConfig = <span class="keyword">new</span> RegistryConfig();</span><br><span class="line">registryConfig.setProtocol(protocol);<span class="comment">//"zookeeper"</span></span><br><span class="line">registryConfig.setAddress(address);</span><br><span class="line">registryConfig.setTimeout(timeOut);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>泛化服务配置</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ReferenceConfig referenceConfig = <span class="keyword">new</span> ReferenceConfig&lt;&gt;();</span><br><span class="line">referenceConfig.setApplication(application);</span><br><span class="line">referenceConfig.setRegistry(registryConfig);</span><br><span class="line"><span class="comment">//设置泛化调用</span></span><br><span class="line">referenceConfig.setGeneric(<span class="keyword">true</span>);</span><br><span class="line">referenceConfig.setInterface(interfaceName);<span class="comment">//接口名字</span></span><br><span class="line">referenceConfig.setVersion(version);<span class="comment">//版本</span></span><br><span class="line">referenceConfig.setGroup(group);<span class="comment">//分组</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>强转成泛化服务并调用</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GenericService genericService = (GenericService) referenceConfig.get();</span><br><span class="line">genericService.$invoke(methodName, parameterTypes, paramList);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对于相同接口、分组和版本的referenceConfig可以通过map进行缓存.</p>
+</li>
+</ol>
+<h2 id="方案三-动态代理"><a href="#方案三-动态代理" class="headerlink" title="方案三:动态代理"></a>方案三:动态代理</h2><p><img src="/2018/04/26/edas的测试路由/方案三.png" alt="方案三"></p>
+<p>基本的思路是项目中所有引用的服务都是通过注解的形式注入的,那么它们就都有一个共同点:即都被<code>@Reference</code>注解,将这些特点的属性都替换为动态代理类,而动态代理类则去调用路由的api.</p>
+<p>现在的问题就是变成了什么时候做代理？在看dubbo源码的时候,发现dubbo是通过spring的<code>BeanPostProcessor</code>做的扩展,但是它还实现了<code>PriorityOrdered</code>接口,因此该dubbo的<code>ReferenceAnnotationBeanPostProcessor</code>类是优先级最高的.所以,同样通过实现<code>BeanPostProcessor</code>接口对满足条件的bean属性做动态代理就可以了.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    Class c = bean.getClass();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//尝试了一下,dubbo¬2.5.7不支持对父类属性的注入,但是2.5.10是支持的</span></span><br><span class="line">    <span class="comment">//这里都做了支持,所以需要开发时注意版本</span></span><br><span class="line">    <span class="keyword">while</span> (c != Object.class) &#123;</span><br><span class="line">        injectReference(c, bean);</span><br><span class="line">        c = c.getSuperclass();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">injectReference</span><span class="params">(Class c, Object bean)</span> </span>&#123;</span><br><span class="line">    Field[] fields = c.getDeclaredFields();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fields == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Field field : fields) &#123;</span><br><span class="line">        Reference reference = field.getAnnotation(Reference.class);</span><br><span class="line">        <span class="comment">//遍历找到dubbo的reference注解</span></span><br><span class="line">        <span class="keyword">if</span> (reference != <span class="keyword">null</span>) &#123;</span><br><span class="line">            Class interfaceClass = field.getType();</span><br><span class="line">            <span class="comment">//过滤路由本身的接口</span></span><br><span class="line">            <span class="keyword">if</span> (interfaceClass == RouterProvider.class) &#123;</span><br><span class="line">                logger.info(<span class="string">"过滤路由接口"</span>);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//判断该属性是否是接口(dubbo应该也有校验)</span></span><br><span class="line">            <span class="keyword">if</span> (!interfaceClass.isInterface()) &#123;</span><br><span class="line">                logger.error(<span class="string">"该属性不是接口&#123;&#125;,&#123;&#125;"</span>, field.getType(), interfaceClass.getName());</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//生成代理类</span></span><br><span class="line">            Object proxy = getProxy(reference, interfaceClass);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">//将生成的代理类代替原来的属性</span></span><br><span class="line">                field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                field.set(bean, proxy);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                logger.error(<span class="string">"属性设置失败,filed:"</span> + field.getName() + <span class="string">" class:"</span> + c.getName(), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">getProxy</span><span class="params">(Reference reference, Class interfaceClass)</span> </span>&#123;</span><br><span class="line">    String key = RouterUtils.generateReferenceBeanCacheKey(reference, interfaceClass);</span><br><span class="line">    Object proxy = proxyMap.get(key);</span><br><span class="line">    <span class="keyword">if</span> (proxy != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> proxy;</span><br><span class="line">    &#125;</span><br><span class="line">    logger.info(<span class="string">"生成代理对象:&#123;&#125;"</span>, key);</span><br><span class="line">    <span class="comment">//支持在reference注解上配置版本、分组,如果没有配置那么就使用consumer上的默认配置</span></span><br><span class="line">    String _group = StringUtils.isEmpty(reference.group()) ? group : reference.group();</span><br><span class="line">    String _version = StringUtils.isEmpty(reference.version()) ? version : reference.version();</span><br><span class="line">    RouterProxyHandler routerProxyHandler = <span class="keyword">new</span> RouterProxyHandler(routerProvider, interfaceClass, _group, _version);</span><br><span class="line">    proxy = Proxy.newProxyInstance(interfaceClass.getClassLoader(), <span class="keyword">new</span> Class[]&#123;interfaceClass&#125;, routerProxyHandler);</span><br><span class="line">    proxyMap.putIfAbsent(key, proxy);</span><br><span class="line">    <span class="keyword">return</span> proxyMap.get(key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后是java动态代理的处理类:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RouterProxyHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(RouterProxyHandler.class);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RouterProvider routerProvider;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Class interfaceClass;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实际需要调用的分组</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String group;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实际需要调用的版本</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String version;</span><br><span class="line"></span><br><span class="line">    RouterProxyHandler(RouterProvider routerProvider, Class interfaceClass, String group, String version) &#123;</span><br><span class="line">        <span class="keyword">this</span>.routerProvider = routerProvider;</span><br><span class="line">        <span class="keyword">this</span>.interfaceClass = interfaceClass;</span><br><span class="line">        <span class="keyword">this</span>.group = group;</span><br><span class="line">        <span class="keyword">this</span>.version = version;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> </span>&#123;</span><br><span class="line">        String methodName = method.getName();</span><br><span class="line">        logger.info(<span class="string">"路由调用&#123;&#125;方法"</span>, methodName);</span><br><span class="line">        <span class="comment">//调用路由的api接口</span></span><br><span class="line">        Object o = routerProvider.trans(interfaceClass.getName(), methodName, getParameterTypes(args), args, group, version);</span><br><span class="line">        <span class="comment">//返回类型</span></span><br><span class="line">        Class returnType = method.getReturnType();</span><br><span class="line">        <span class="comment">//返回的泛化类型,GWResult&lt;...&gt;</span></span><br><span class="line">        Type genericReturnType = method.getGenericReturnType();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//反序列化</span></span><br><span class="line">            <span class="keyword">return</span> PojoUtils.realize(o, returnType, genericReturnType);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(<span class="string">"反序列化失败:&#123;&#125;"</span>, o.toString());</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 得到参数数组的类型(字符串形式)</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> args 参数数组</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 参数的类型(字符串形式)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String[] getParameterTypes(Object[] args) &#123;</span><br><span class="line">        <span class="keyword">if</span> (args == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        String[] parameterTypes = <span class="keyword">new</span> String[args.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; args.length; i++) &#123;</span><br><span class="line">            parameterTypes[i] = args[i].getClass().getName();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> parameterTypes;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="方案四-dubbo-filter"><a href="#方案四-dubbo-filter" class="headerlink" title="方案四:dubbo filter"></a>方案四:dubbo filter</h2><p>方案三虽然已经满足项目的要求,但是它是有适用性的,即只能对注解配置的dubbo reference有效,而且,大项目测试过程中,需要扫bean然后生成几十个代理类,会拖累测试的启动速度.基于此,有没有一种在调用时拦截并调用路由的方案呢?在对dubbo的调用链路进行理解后,发现dubbo就提供了filter的扩展点,先将示意图贴上:<br><img src="/2018/04/26/edas的测试路由/方案四.png" alt="方案四"></p>
+<h3 id="spi注解"><a href="#spi注解" class="headerlink" title="spi注解"></a>spi注解</h3><p>要使用dubbo filter那么就需要首先理解dubbo的spi机制,简单讲一下.</p>
+<h4 id="SPI"><a href="#SPI" class="headerlink" title="@SPI"></a>@SPI</h4><p>spi注解标注在扩展接口上,该注解的值表明是该扩展接口的默认实现.</p>
+<h4 id="Adaptive"><a href="#Adaptive" class="headerlink" title="@Adaptive"></a>@Adaptive</h4><ol>
+<li>该注解标注在类上表明该类是其spi接口的适配实现.</li>
+<li>注解在spi的接口方法上,表明该方法会通过源代码生成一个适配实现,这个方法的入参中必须有URL类型或者有无参且返回类型是URL的方法.源代码生成的默认实现仅仅是从URL中根据@Adaptive注解的值为键取得相应的实现,如果没有取得就采用默认实现.</li>
+</ol>
+<h4 id="Activate"><a href="#Activate" class="headerlink" title="@Activate"></a>@Activate</h4><p>这个注解就与filter有关了,<code>protocol</code>接口的包装类<code>ProtocolFilterWrapper</code>会取得所有满足条件的filter构成链,最终调用的时候就会先调用filter链.</p>
+<p>解释一下该注解的属性:</p>
+<h5 id="group"><a href="#group" class="headerlink" title="group"></a>group</h5><p>有两个值可选:consumer和provider.表明该filter在消费端或者提供者生效,没有值即两种情况都生效.可以看<code>ProtocolFilterWrapper</code>在refer和export方法指定了相应的值.</p>
+<h5 id="value"><a href="#value" class="headerlink" title="value"></a>value</h5><p>URL中有相应value的非false值才会生效.</p>
+<h5 id="before-after-order"><a href="#before-after-order" class="headerlink" title="before,after,order"></a>before,after,order</h5><p>这三个值指定了filter的调用顺序,具体可以看<code>ActivateComparator</code>这个类是怎么排序的.</p>
+<h3 id="spi使用"><a href="#spi使用" class="headerlink" title="spi使用"></a>spi使用</h3><p>spi的使用非常简单,首先建一个文件,文件的目录必须是META-INF/services/,META-INF/dubbo/和META-INF/dubbo/internal/的其中一个.文件的名字必须是扩展接口的全类名,示例:com.alibaba.dubbo.rpc.Filter.内容是键值对的形式,键为对象的名字,值是该扩展接口的实现类,示例:router=com.sxc.dubbo.router.filter.RouterFilter.</p>
+<h3 id="RouterFilter"><a href="#RouterFilter" class="headerlink" title="RouterFilter"></a>RouterFilter</h3><p>现在是怎么实现该filter?首先,肯定要将路由api的实现注入进来,这也可以使用dubbo提供的<code>ExtensionFactory</code>来得到.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可以看到ExtensionFactory接口的适配实现只是从所有的ExtensionFactory实现中去取相应的对象</span></span><br><span class="line"><span class="comment">//SpiExtensionFactory是从dubbo管理的对象中去取</span></span><br><span class="line"><span class="comment">//SpringExtensionFactory通过spring上下文中通过名字和类型去取</span></span><br><span class="line">routerProvider = ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension().getExtension(RouterProvider.class, <span class="string">"router"</span>;</span><br></pre></td></tr></table></figure>
+<p>现在是要找到所有路由api需要的入参.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//得到url</span></span><br><span class="line">URL url = invoker.getUrl();</span><br><span class="line"><span class="comment">//得到接口class</span></span><br><span class="line">Class interfaceClass = invoker.getInterface();</span><br><span class="line"><span class="comment">//如果就是路由本身就直接进行下一个filter</span></span><br><span class="line"><span class="keyword">if</span> (RouterProvider.class == interfaceClass) &#123;</span><br><span class="line">    <span class="keyword">return</span> invoker.invoke(invocation);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//得到方法名字</span></span><br><span class="line">String methodName = invocation.getMethodName();</span><br><span class="line">Method method = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">//得到方法,这里理论上是肯定有该方法的</span></span><br><span class="line">    method = interfaceClass.getMethod(methodName, invocation.getParameterTypes());</span><br><span class="line">&#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> RpcException(e.getMessage(), e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用路由provider</span></span><br><span class="line">Object o = routerProvider.trans(interfaceClass.getName(), methodName, getParameterTypesStr(invocation.getParameterTypes()),</span><br><span class="line">        invocation.getArguments(), url.getParameter(<span class="string">"group"</span>), url.getParameter(<span class="string">"version"</span>));</span><br><span class="line"><span class="comment">//返回类型</span></span><br><span class="line">Class returnType = method.getReturnType();</span><br><span class="line"><span class="comment">//返回类型,包含泛化类型</span></span><br><span class="line">Type g = method.getGenericReturnType();</span><br><span class="line"><span class="comment">//反序列化</span></span><br><span class="line">o = PojoUtils.realize(o, returnType, g);</span><br><span class="line"><span class="keyword">return</span> <span class="keyword">new</span> RpcResult(o);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> String[] getParameterTypesStr(Class[] args) &#123;</span><br><span class="line">    <span class="keyword">if</span> (args == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    String[] parameterTypes = <span class="keyword">new</span> String[args.length];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; args.length; i++) &#123;</span><br><span class="line">        parameterTypes[i] = args[i].getName();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> parameterTypes;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/23/AbstractConfig/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -328,7 +501,7 @@
             <h1 id="AbstractConfig"><a href="#AbstractConfig" class="headerlink" title="AbstractConfig"></a>AbstractConfig</h1><p>这是dubbo配置类的基类,dubbo中基本所有配置类都从该类继承(目前只有ArgumentConfig不是),该类只有id一个属性,因此主要是看一下它的一些静态方法.</p>
 <h2 id="关闭的钩子函数"><a href="#关闭的钩子函数" class="headerlink" title="关闭的钩子函数"></a>关闭的钩子函数</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (logger.isInfoEnabled()) &#123;</span><br><span class="line">                logger.info(<span class="string">"Run shutdown hook now."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            ProtocolConfig.destroyAll();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="string">"DubboShutdownHook"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>java原有提供finalize来作为对象回收时的调用的方法,但是早已不推荐使用(个人理解是jvm对象回收的原因),因此额外提供了Runtime.getRuntime().addShutdownHook来作为新的钩子函数,dubbo利用其调用了解析配置的destroyAll方法.</p>
-<h2 id="appendProperties"><a href="#appendProperties" class="headerlink" title="appendProperties"></a>appendProperties</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">appendProperties</span><span class="params">(AbstractConfig config)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (config == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//getTagName是将类名去掉后缀,dubbo配置累的后缀主要是Config,也有ReferenceBean这样的Bean结尾的</span></span><br><span class="line">    <span class="comment">//类名对应的配置标签前面加上dubbo.的通用前缀</span></span><br><span class="line">    String prefix = <span class="string">"dubbo."</span> + getTagName(config.getClass()) + <span class="string">"."</span>;</span><br><span class="line">    Method[] methods = config.getClass().getMethods();</span><br><span class="line">    <span class="comment">//遍历方法,找到set开头的,参数只有一个且是基本类型(包括基本类型的包装类和String,Object)的public方法</span></span><br><span class="line">    <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String name = method.getName();</span><br><span class="line">            <span class="keyword">if</span> (name.length() &gt; <span class="number">3</span> &amp;&amp; name.startsWith(<span class="string">"set"</span>) &amp;&amp; Modifier.isPublic(method.getModifiers())</span><br><span class="line">                    &amp;&amp; method.getParameterTypes().length == <span class="number">1</span> &amp;&amp; isPrimitive(method.getParameterTypes()[<span class="number">0</span>])) &#123;</span><br><span class="line">                <span class="comment">//驼峰方法名转化:AppleTree转化为apple.tree</span></span><br><span class="line">                String property = StringUtils.camelToSplitName(name.substring(<span class="number">3</span>, <span class="number">4</span>).toLowerCase() + name.substring(<span class="number">4</span>), <span class="string">"."</span>);</span><br><span class="line"></span><br><span class="line">                String value = <span class="keyword">null</span>;</span><br><span class="line">                <span class="comment">//拿到所有的id,因为配置类继承自AbstractConfig,因此基本都有id属性,把id配置到属性的前面</span></span><br><span class="line">                <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + config.getId() + <span class="string">"."</span> + property;</span><br><span class="line">                    value = System.getProperty(pn);<span class="comment">//从环境中拿</span></span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//如果没有指定了id的属性,那么就从环境中拿不指定id的属性,注意区分pn的不同</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + property;</span><br><span class="line">                    value = System.getProperty(pn);</span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//环境中没有,那么就调用相应get或is方法</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    Method getter;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        getter = config.getClass().getMethod(<span class="string">"get"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            getter = config.getClass().getMethod(<span class="string">"is"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (NoSuchMethodException e2) &#123;</span><br><span class="line">                            getter = <span class="keyword">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (getter != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (getter.invoke(config, <span class="keyword">new</span> Object[<span class="number">0</span>]) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + config.getId() + <span class="string">"."</span> + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                String legacyKey = legacyProperties.get(prefix + property);</span><br><span class="line">                                <span class="keyword">if</span> (legacyKey != <span class="keyword">null</span> &amp;&amp; legacyKey.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                    value = convertLegacyValue(legacyKey, ConfigUtils.getProperty(legacyKey));</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (value != <span class="keyword">null</span> &amp;&amp; value.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    method.invoke(config, <span class="keyword">new</span> Object[]&#123;convertPrimitive(method.getParameterTypes()[<span class="number">0</span>], value)&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(e.getMessage(), e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="appendProperties"><a href="#appendProperties" class="headerlink" title="appendProperties"></a>appendProperties</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法主要是为了支持环境变量的属性配置</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">appendProperties</span><span class="params">(AbstractConfig config)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (config == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//getTagName是将类名去掉后缀,dubbo配置累的后缀主要是Config,也有ReferenceBean这样的Bean结尾的</span></span><br><span class="line">    <span class="comment">//类名对应的配置标签前面加上dubbo.的通用前缀</span></span><br><span class="line">    String prefix = <span class="string">"dubbo."</span> + getTagName(config.getClass()) + <span class="string">"."</span>;</span><br><span class="line">    Method[] methods = config.getClass().getMethods();</span><br><span class="line">    <span class="comment">//遍历方法,找到set开头的,参数只有一个且是基本类型(包括基本类型的包装类和String,Object)的public方法</span></span><br><span class="line">    <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String name = method.getName();</span><br><span class="line">            <span class="keyword">if</span> (name.length() &gt; <span class="number">3</span> &amp;&amp; name.startsWith(<span class="string">"set"</span>) &amp;&amp; Modifier.isPublic(method.getModifiers())</span><br><span class="line">                    &amp;&amp; method.getParameterTypes().length == <span class="number">1</span> &amp;&amp; isPrimitive(method.getParameterTypes()[<span class="number">0</span>])) &#123;</span><br><span class="line">                <span class="comment">//驼峰方法名转化:AppleTree转化为apple.tree</span></span><br><span class="line">                String property = StringUtils.camelToSplitName(name.substring(<span class="number">3</span>, <span class="number">4</span>).toLowerCase() + name.substring(<span class="number">4</span>), <span class="string">"."</span>);</span><br><span class="line"></span><br><span class="line">                String value = <span class="keyword">null</span>;</span><br><span class="line">                <span class="comment">//拿到所有的id,因为配置类继承自AbstractConfig,因此基本都有id属性,把id配置到属性的前面</span></span><br><span class="line">                <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + config.getId() + <span class="string">"."</span> + property;</span><br><span class="line">                    value = System.getProperty(pn);<span class="comment">//从环境中拿</span></span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//如果没有指定了id的属性,那么就从环境中拿不指定id的属性,注意区分pn的不同</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    String pn = prefix + property;</span><br><span class="line">                    value = System.getProperty(pn);</span><br><span class="line">                    <span class="keyword">if</span> (!StringUtils.isBlank(value)) &#123;</span><br><span class="line">                        logger.info(<span class="string">"Use System Property "</span> + pn + <span class="string">" to config dubbo"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//环境中没有,那么就调用相应get或is方法</span></span><br><span class="line">                <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                    Method getter;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        getter = config.getClass().getMethod(<span class="string">"get"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            getter = config.getClass().getMethod(<span class="string">"is"</span> + name.substring(<span class="number">3</span>), <span class="keyword">new</span> Class&lt;?&gt;[<span class="number">0</span>]);</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (NoSuchMethodException e2) &#123;</span><br><span class="line">                            getter = <span class="keyword">null</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (getter != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (getter.invoke(config, <span class="keyword">new</span> Object[<span class="number">0</span>]) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (config.getId() != <span class="keyword">null</span> &amp;&amp; config.getId().length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + config.getId() + <span class="string">"."</span> + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                value = ConfigUtils.getProperty(prefix + property);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                                String legacyKey = legacyProperties.get(prefix + property);</span><br><span class="line">                                <span class="keyword">if</span> (legacyKey != <span class="keyword">null</span> &amp;&amp; legacyKey.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                    value = convertLegacyValue(legacyKey, ConfigUtils.getProperty(legacyKey));</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (value != <span class="keyword">null</span> &amp;&amp; value.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    method.invoke(config, <span class="keyword">new</span> Object[]&#123;convertPrimitive(method.getParameterTypes()[<span class="number">0</span>], value)&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(e.getMessage(), e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
           
         
@@ -1464,169 +1637,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/知识点/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/知识点/" itemprop="url">知识点</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:45:58+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="编辑运行命令"><a href="#编辑运行命令" class="headerlink" title="编辑运行命令"></a>编辑运行命令</h2><p>javac Test.java</p>
-<p>java Test</p>
-<h2 id="基础类型-primitive-type"><a href="#基础类型-primitive-type" class="headerlink" title="基础类型(primitive type)"></a>基础类型(primitive type)</h2><p>byte short int long 对应字节数：1，2，4，8</p>
-<p>float double 对应字节数：4，8</p>
-<p>char </p>
-<p>boolean</p>
-<p>Double.POSITIVE_INFINITY、Double.NEGATIVE_INFINITY和Double.NaN分别表示无穷大、无穷小和非数(0/0)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//is never true</span></span><br><span class="line"><span class="keyword">if</span> (x == Double.NaN)</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//正确判断方式</span></span><br><span class="line"><span class="keyword">if</span> (Double.isNaN(x))</span><br></pre></td></tr></table></figure>
-<h2 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Character.isJavaIdentifierStart();<span class="comment">//判断该字符是否可以作为变量的开头</span></span><br><span class="line">Character.isJavaIdentifierPart();<span class="comment">//判断该字符是否可以作为变量的一部分</span></span><br></pre></td></tr></table></figure>
-<h2 id="数值计算"><a href="#数值计算" class="headerlink" title="数值计算"></a>数值计算</h2><p>整型计算 /求商 %求余</p>
-<p>数值计算的中间过程允许是扩展的精度，即超出字段的范围，最后的结尾进行截断成为对应字节数的长度</p>
-<p><strong>strictfp</strong>关键字标记类或者方法，所有的运算都将使用严格的浮点计算</p>
-<p>位计算符：&amp;（”与”）、|（”或”）、^（”异或”）、~（”非”）</p>
-<p>>&gt;&gt;运算符将用0填充高位；&gt;&gt;运算符用符号位填充高位；没有&lt;&lt;&lt;运算符</p>
-<p>对移位运算符右侧的参数需要进行模32的运算（除非左边的操作数是long类型，<br>在这种情况下需对右侧操作数模64）。例如，1 &lt;&lt; 35与1 &lt;&lt; 3是相同的。</p>
-<p>如果得到一个完全可预测的结果比运行速度更重要的话，那么就应该使用StrictMath类。</p>
-<p><img src="/2018/04/12/知识点/精度.png" alt="数值类型之间的合法转换.png"></p>
-<p>6个实心箭头，表示无信息丢失的转换；3个虚箭头，表示可能有精度损失<br>的转换</p>
-<ul>
-<li>如果两个操作数中有一个是double类型的，另一个操作数就会转换为double类型。</li>
-<li>否则，如果其中一个操作数是float类型，另一个操作数将会转换为float类型。</li>
-<li>否则，如果其中一个操作数是long类型，另一个操作数将会转换为long类型。</li>
-<li>否则，两个操作数都将被转换为int类型。</li>
-</ul>
-<h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><p>length方法将返回采用UTF-16编码表示的给定字符串所需要的代码单元数量;要想得到实际的长度，即代码点数量，可以调用：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = s.codePointCount(<span class="number">0</span>, s.length());</span><br></pre></td></tr></table></figure>
-<p>调用s.charAt(n) 将返回位置n的代码单元，n介于0～s.length()-1之间;要想得到第i个代码点，应该使用下列语句:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> index = s.offsetByCodePoints(<span class="number">0</span>, i);</span><br><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br></pre></td></tr></table></figure>
-<p>如果想要遍历一个字符串，并且依次查看每一个代码点，可以使用下列语句：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br><span class="line"><span class="keyword">if</span> (Character.isSupplementaryCodePoint(cp)) i+=<span class="number">2</span>;</span><br><span class="line"><span class="keyword">else</span> i++;</span><br></pre></td></tr></table></figure>
-<p>StringBuilder线程不安全；StringBuffer线程安全</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//数组</span></span><br><span class="line">Arrays.toString</span><br><span class="line">Arrays.deepToString</span><br></pre></td></tr></table></figure>
-<h2 id="System-in"><a href="#System-in" class="headerlink" title="System.in"></a>System.in</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Scanner s = <span class="keyword">new</span> Scanner(System.in)</span><br></pre></td></tr></table></figure>
-<p>因为输入是可见的，所以Scanner类不适用于从控制台读取密码。Java SE 6特别引<br>入了Console类实现这个目的。要想读取一个密码，可以采用下列代码(为了安全起见，返回的密码存放在一维字符数组中，而不是字符串中。在对密码进行处理之后，应该马上用一个填充值覆盖数组元素)：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注意只能控制台运行，idea无法得到console</span></span><br><span class="line">Console c = System.console();</span><br><span class="line">String username = c.readLine(<span class="string">"User name: "</span>);</span><br><span class="line"><span class="keyword">char</span>[] password = c.readPassword(<span class="string">"password: "</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="方法传参"><a href="#方法传参" class="headerlink" title="方法传参"></a>方法传参</h2><p>java都是值引用</p>
-<ul>
-<li>一个方法不能修改一个基本数据类型的参数（即数值型和布尔型）。</li>
-<li>一个方法可以改变一个对象参数的状态。</li>
-<li>一个方法不能实现让对象参数引用一个新的对象。</li>
-</ul>
-<h2 id="finalize"><a href="#finalize" class="headerlink" title="finalize"></a>finalize</h2><p>System.runFinalizersOnExit(true) 的方法能够确保finalizer方法在Java关闭<br>前被调用。不过，这个方法并不安全，也不鼓励大家使用。有一种代替的方法是使用方法<br>Runtime.addShutdownHook添加“关闭钩”（shutdown hook）</p>
-<h2 id="数组克隆"><a href="#数组克隆" class="headerlink" title="数组克隆"></a>数组克隆</h2><p>所有的数组类型均包含一个clone方法，这个方法被设为public，而不是protected。可以利用这个方法创建一个包含所有数据元素拷贝的一个新数组。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1681,7 +1691,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

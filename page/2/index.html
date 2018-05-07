@@ -254,6 +254,169 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/知识点/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/12/知识点/" itemprop="url">知识点</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:45:58+08:00">
+                2018-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="编辑运行命令"><a href="#编辑运行命令" class="headerlink" title="编辑运行命令"></a>编辑运行命令</h2><p>javac Test.java</p>
+<p>java Test</p>
+<h2 id="基础类型-primitive-type"><a href="#基础类型-primitive-type" class="headerlink" title="基础类型(primitive type)"></a>基础类型(primitive type)</h2><p>byte short int long 对应字节数：1，2，4，8</p>
+<p>float double 对应字节数：4，8</p>
+<p>char </p>
+<p>boolean</p>
+<p>Double.POSITIVE_INFINITY、Double.NEGATIVE_INFINITY和Double.NaN分别表示无穷大、无穷小和非数(0/0)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//is never true</span></span><br><span class="line"><span class="keyword">if</span> (x == Double.NaN)</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//正确判断方式</span></span><br><span class="line"><span class="keyword">if</span> (Double.isNaN(x))</span><br></pre></td></tr></table></figure>
+<h2 id="变量命名"><a href="#变量命名" class="headerlink" title="变量命名"></a>变量命名</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Character.isJavaIdentifierStart();<span class="comment">//判断该字符是否可以作为变量的开头</span></span><br><span class="line">Character.isJavaIdentifierPart();<span class="comment">//判断该字符是否可以作为变量的一部分</span></span><br></pre></td></tr></table></figure>
+<h2 id="数值计算"><a href="#数值计算" class="headerlink" title="数值计算"></a>数值计算</h2><p>整型计算 /求商 %求余</p>
+<p>数值计算的中间过程允许是扩展的精度，即超出字段的范围，最后的结尾进行截断成为对应字节数的长度</p>
+<p><strong>strictfp</strong>关键字标记类或者方法，所有的运算都将使用严格的浮点计算</p>
+<p>位计算符：&amp;（”与”）、|（”或”）、^（”异或”）、~（”非”）</p>
+<p>>&gt;&gt;运算符将用0填充高位；&gt;&gt;运算符用符号位填充高位；没有&lt;&lt;&lt;运算符</p>
+<p>对移位运算符右侧的参数需要进行模32的运算（除非左边的操作数是long类型，<br>在这种情况下需对右侧操作数模64）。例如，1 &lt;&lt; 35与1 &lt;&lt; 3是相同的。</p>
+<p>如果得到一个完全可预测的结果比运行速度更重要的话，那么就应该使用StrictMath类。</p>
+<p><img src="/2018/04/12/知识点/精度.png" alt="数值类型之间的合法转换.png"></p>
+<p>6个实心箭头，表示无信息丢失的转换；3个虚箭头，表示可能有精度损失<br>的转换</p>
+<ul>
+<li>如果两个操作数中有一个是double类型的，另一个操作数就会转换为double类型。</li>
+<li>否则，如果其中一个操作数是float类型，另一个操作数将会转换为float类型。</li>
+<li>否则，如果其中一个操作数是long类型，另一个操作数将会转换为long类型。</li>
+<li>否则，两个操作数都将被转换为int类型。</li>
+</ul>
+<h2 id="String"><a href="#String" class="headerlink" title="String"></a>String</h2><p>length方法将返回采用UTF-16编码表示的给定字符串所需要的代码单元数量;要想得到实际的长度，即代码点数量，可以调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = s.codePointCount(<span class="number">0</span>, s.length());</span><br></pre></td></tr></table></figure>
+<p>调用s.charAt(n) 将返回位置n的代码单元，n介于0～s.length()-1之间;要想得到第i个代码点，应该使用下列语句:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> index = s.offsetByCodePoints(<span class="number">0</span>, i);</span><br><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br></pre></td></tr></table></figure>
+<p>如果想要遍历一个字符串，并且依次查看每一个代码点，可以使用下列语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> cp = s.codePointAt(index);</span><br><span class="line"><span class="keyword">if</span> (Character.isSupplementaryCodePoint(cp)) i+=<span class="number">2</span>;</span><br><span class="line"><span class="keyword">else</span> i++;</span><br></pre></td></tr></table></figure>
+<p>StringBuilder线程不安全；StringBuffer线程安全</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//数组</span></span><br><span class="line">Arrays.toString</span><br><span class="line">Arrays.deepToString</span><br></pre></td></tr></table></figure>
+<h2 id="System-in"><a href="#System-in" class="headerlink" title="System.in"></a>System.in</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Scanner s = <span class="keyword">new</span> Scanner(System.in)</span><br></pre></td></tr></table></figure>
+<p>因为输入是可见的，所以Scanner类不适用于从控制台读取密码。Java SE 6特别引<br>入了Console类实现这个目的。要想读取一个密码，可以采用下列代码(为了安全起见，返回的密码存放在一维字符数组中，而不是字符串中。在对密码进行处理之后，应该马上用一个填充值覆盖数组元素)：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注意只能控制台运行，idea无法得到console</span></span><br><span class="line">Console c = System.console();</span><br><span class="line">String username = c.readLine(<span class="string">"User name: "</span>);</span><br><span class="line"><span class="keyword">char</span>[] password = c.readPassword(<span class="string">"password: "</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="方法传参"><a href="#方法传参" class="headerlink" title="方法传参"></a>方法传参</h2><p>java都是值引用</p>
+<ul>
+<li>一个方法不能修改一个基本数据类型的参数（即数值型和布尔型）。</li>
+<li>一个方法可以改变一个对象参数的状态。</li>
+<li>一个方法不能实现让对象参数引用一个新的对象。</li>
+</ul>
+<h2 id="finalize"><a href="#finalize" class="headerlink" title="finalize"></a>finalize</h2><p>System.runFinalizersOnExit(true) 的方法能够确保finalizer方法在Java关闭<br>前被调用。不过，这个方法并不安全，也不鼓励大家使用。有一种代替的方法是使用方法<br>Runtime.addShutdownHook添加“关闭钩”（shutdown hook）</p>
+<h2 id="数组克隆"><a href="#数组克隆" class="headerlink" title="数组克隆"></a>数组克隆</h2><p>所有的数组类型均包含一个clone方法，这个方法被设为public，而不是protected。可以利用这个方法创建一个包含所有数据元素拷贝的一个新数组。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/泛型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1426,7 +1589,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
