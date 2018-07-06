@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="java核心技术," />
+  <meta name="keywords" content="java," />
 
 
 
@@ -82,14 +82,14 @@
 
 
 <meta name="description" content="queue队列实现：循环数组和链表 remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下： 12345Iterator it = list.iterator();it.next();it.remove();it.next();it.remove(); WeakHashMap只有映射表本身持有某个键值的时候，会将键值存入队列，WeakHashMap周期性检">
-<meta name="keywords" content="java核心技术">
+<meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="collection">
 <meta property="og:url" content="http://yoursite.com/2018/04/12/collection/index.html">
 <meta property="og:site_name" content="个人博客">
 <meta property="og:description" content="queue队列实现：循环数组和链表 remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下： 12345Iterator it = list.iterator();it.next();it.remove();it.next();it.remove(); WeakHashMap只有映射表本身持有某个键值的时候，会将键值存入队列，WeakHashMap周期性检">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-16T02:42:41.115Z">
+<meta property="og:updated_time" content="2018-07-06T08:12:21.370Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="collection">
 <meta name="twitter:description" content="queue队列实现：循环数组和链表 remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下： 12345Iterator it = list.iterator();it.next();it.remove();it.next();it.remove(); WeakHashMap只有映射表本身持有某个键值的时候，会将键值存入队列，WeakHashMap周期性检">
@@ -333,6 +333,8 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Collections.unmodifiableCollection</span><br><span class="line">Collections.unmodifiableList</span><br><span class="line">Collections.unmodifiableSet</span><br><span class="line">Collections.unmodifiableSortedSet</span><br><span class="line">Collections.unmodifiableMap</span><br><span class="line">Collections.unmodifiableSortedMap</span><br></pre></td></tr></table></figure>
 <p>Collections类的静态synchronizedMap方法可以将任何一个映射表转换成具有同步访问方法的Map;list同理</p>
 <p>二分查找只有在支持随机访问的数据结构上才有意义，如果是一个链表，将会每一次都遍历一半元素来找到中间位置，二分查找就失去了优势。</p>
+<h3 id="IdentityHashMap"><a href="#IdentityHashMap" class="headerlink" title="IdentityHashMap"></a>IdentityHashMap</h3><p>一个使用<code>==</code>来判断键是否相等的map</p>
+<h3 id="ConcurrentReferenceHashMap"><a href="#ConcurrentReferenceHashMap" class="headerlink" title="ConcurrentReferenceHashMap"></a>ConcurrentReferenceHashMap</h3><p>使用<code>Reference</code>(默认<code>SoftReference</code>,或者<code>WeakReference</code>)来保存的map</p>
 
       
     </div>
@@ -350,7 +352,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/java核心技术/" rel="tag"># java核心技术</a>
+            <a href="/tags/java/" rel="tag"># java</a>
           
         </div>
       
@@ -427,8 +429,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -447,7 +458,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -460,7 +471,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -490,6 +501,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#IdentityHashMap"><span class="nav-number">1.</span> <span class="nav-text">IdentityHashMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ConcurrentReferenceHashMap"><span class="nav-number">2.</span> <span class="nav-text">ConcurrentReferenceHashMap</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -254,6 +254,286 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/24/linux文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/24/linux文件/" itemprop="url">linux文件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-24T10:17:33+08:00">
+                2018-05-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="linux文件"><a href="#linux文件" class="headerlink" title="linux文件"></a>linux文件</h1><p>使用<code>ls -al</code>命令，可以查看文件的各项属性,现按照其顺序进行一个记录。</p>
+<h2 id="权限与类型"><a href="#权限与类型" class="headerlink" title="权限与类型"></a>权限与类型</h2><p>一共十个字符，第一个字符代表文件的类型</p>
+<ul>
+<li>d：代表目录</li>
+<li>-：代表文件</li>
+<li>|：代表链接文件(link file)</li>
+<li>b：可存储设备</li>
+<li>c：序列化设备，一次性读取设备，例如鼠标键盘</li>
+</ul>
+<p>后面九个字符三个一组，代表不同角色的权限，如果是<code>-</code>代表没有对应位置的权限，三组的依照顺序，依次代表所有者，群组，其他人的权限</p>
+<ul>
+<li>r：可读read</li>
+<li>w：可写write</li>
+<li>x：可执行execute</li>
+</ul>
+<p>例：<code>drwxr-xr--</code>代表一个文件，文件拥有者可以在本目录中进行任何工作，通群组的人可以进入该目录，但是不能在本目录下写入，其他人虽然有<code>r</code>但是没有<code>x</code>，并不能进入该目录</p>
+<p>权限是对内容的影响，文件的权限比较容易理解，对于目录同样可以将目录含有的文件名作为其内容，可读即指可以查看其下的文件名，可写即指可以改变其下的文件名，包括新建文件、删除文件(不论该文件的权限为何)、更改文件名、搬移文件位置等，可执行代表可以进入该目录<code>cd(change directory)</code></p>
+<h3 id="chgrp"><a href="#chgrp" class="headerlink" title="chgrp"></a>chgrp</h3><p>修改群组，所有群组定义在<code>/etc/group</code>文件中，<code>-R</code>递归</p>
+<h3 id="chown"><a href="#chown" class="headerlink" title="chown"></a>chown</h3><p>修改所属人，不建议通过该命令修改群组，<code>-R</code>递归</p>
+<h3 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a>chmod</h3><p>修改权限，</p>
+<h2 id="链接数"><a href="#链接数" class="headerlink" title="链接数"></a>链接数</h2><h2 id="拥有者"><a href="#拥有者" class="headerlink" title="拥有者"></a>拥有者</h2><h2 id="文件所属群组"><a href="#文件所属群组" class="headerlink" title="文件所属群组"></a>文件所属群组</h2><h2 id="文件大小，默认单位Bytes"><a href="#文件大小，默认单位Bytes" class="headerlink" title="文件大小，默认单位Bytes"></a>文件大小，默认单位Bytes</h2><h2 id="创建日期或者是修改日期"><a href="#创建日期或者是修改日期" class="headerlink" title="创建日期或者是修改日期"></a>创建日期或者是修改日期</h2><h2 id="文件名"><a href="#文件名" class="headerlink" title="文件名"></a>文件名</h2><p><code>.</code>表示是隐藏文件，在<code>ls</code>命令中不会显示</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/14/java内存划分/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/14/java内存划分/" itemprop="url">java内存划分</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-14T23:47:55+08:00">
+                2018-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="java内存区域"><a href="#java内存区域" class="headerlink" title="java内存区域"></a>java内存区域</h1><h2 id="程序计数器-program-counter-register"><a href="#程序计数器-program-counter-register" class="headerlink" title="程序计数器 program counter register"></a>程序计数器 program counter register</h2><p>java方法：虚拟机字节码指令的地址<br>native方法：空(undefined)<br>此区域是java虚拟机规范中唯一没有规定任何<code>OutOfMemoryError</code></p>
+<h2 id="java栈-java-virtual-machine-stacks"><a href="#java栈-java-virtual-machine-stacks" class="headerlink" title="java栈 java virtual machine stacks"></a>java栈 java virtual machine stacks</h2><p>栈帧 stack frame：存储局部变量表、操作数栈、动态链接、方法出口等信息<br>局部变量表存放了编译器可知的各种基本数据类型(byte,short,int,long,float,double,boolean,char),对象引用(reference),和returnAddress类型(指向了一条字节码指令的地址)</p>
+<h2 id="本地方法栈-native-method-stack"><a href="#本地方法栈-native-method-stack" class="headerlink" title="本地方法栈 native method stack"></a>本地方法栈 native method stack</h2><h2 id="java堆-heap"><a href="#java堆-heap" class="headerlink" title="java堆 heap"></a>java堆 heap</h2><ul>
+<li><p>新生代</p>
+<ul>
+<li><p>eden</p>
+</li>
+<li><p>from survivor</p>
+</li>
+<li><p>to survivor</p>
+</li>
+</ul>
+</li>
+<li><p>老年代</p>
+</li>
+</ul>
+<p>-Xmx</p>
+<p>-Xms</p>
+<h2 id="方法区-method-area"><a href="#方法区-method-area" class="headerlink" title="方法区 method area"></a>方法区 method area</h2><p>用于存储已被虚拟机加载的类信息，常量，静态遍历，即时编译器编译后的代码等数据</p>
+<p>metaspace</p>
+<h3 id="运行时常量池-runtime-constant-pool"><a href="#运行时常量池-runtime-constant-pool" class="headerlink" title="运行时常量池 runtime constant pool"></a>运行时常量池 runtime constant pool</h3><h2 id="直接内存-direct-memory"><a href="#直接内存-direct-memory" class="headerlink" title="直接内存 direct memory"></a>直接内存 direct memory</h2><p>nio</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/26/edas的测试路由/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1377,270 +1657,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/enum/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/enum/" itemprop="url">enum</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:47:09+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p>枚举可以通过==判断相等</p>
-</li>
-<li><p>枚举的toString方法返回枚举常量名，Enum.valueOf是toString的逆方法</p>
-</li>
-<li><p>每个枚举类型都有一个静态的values方法，返回包含全部枚举值的数组</p>
-</li>
-<li><p>ordinal方法返回枚举常量的位置，从0开始计数</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/collection/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/collection/" itemprop="url">collection</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:46:41+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>queue队列实现：循环数组和链表</p>
-<p>remove方法删除刚刚越过的那个元素，不能连续调用两次remove来删除两个元素，正确方式如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Iterator it = list.iterator();</span><br><span class="line">it.next();</span><br><span class="line">it.remove();</span><br><span class="line">it.next();</span><br><span class="line">it.remove();</span><br></pre></td></tr></table></figure>
-<p>WeakHashMap只有映射表本身持有某个键值的时候，会将键值存入队列，WeakHashMap周期性检查队列删除对应条目。</p>
-<p>LinkedHashSet和LinkedHashMap记住了存放顺序，在值上添加了双向链表。</p>
-<p><code>Arrays.asList</code></p>
-<p><code>Collections.singleton</code></p>
-<p>不可修改的视图：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Collections.unmodifiableCollection</span><br><span class="line">Collections.unmodifiableList</span><br><span class="line">Collections.unmodifiableSet</span><br><span class="line">Collections.unmodifiableSortedSet</span><br><span class="line">Collections.unmodifiableMap</span><br><span class="line">Collections.unmodifiableSortedMap</span><br></pre></td></tr></table></figure>
-<p>Collections类的静态synchronizedMap方法可以将任何一个映射表转换成具有同步访问方法的Map;list同理</p>
-<p>二分查找只有在支持随机访问的数据结构上才有意义，如果是一个链表，将会每一次都遍历一半元素来找到中间位置，二分查找就失去了优势。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1690,7 +1711,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1703,7 +1724,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
