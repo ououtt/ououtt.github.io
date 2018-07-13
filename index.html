@@ -254,6 +254,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/13/Comparator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/13/Comparator/" itemprop="url">Comparator</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-13T11:01:23+08:00">
+                2018-07-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Comparator"><a href="#Comparator" class="headerlink" title="Comparator"></a>Comparator</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">list.sort((o1,o2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (o1.getId() == <span class="keyword">null</span> || o2.getId() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o1.compareTo(o1);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这是工作中看到的一段排序的代码，第一眼看过去似乎是没问题的，应用了java8的语法，而且也避免了空指针异常，但其实是有问题的，问题就在sort这个排序方法上。</p>
+<p>于是我做了一个测试，代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//[null, 3, 5, 9, 13, null, 12]</span></span><br><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">list.add(<span class="keyword">null</span>);</span><br><span class="line">list.add(<span class="number">13</span>);</span><br><span class="line">list.add(<span class="number">5</span>);</span><br><span class="line">list.add(<span class="number">9</span>);</span><br><span class="line">list.add(<span class="keyword">null</span>);</span><br><span class="line">list.add(<span class="number">3</span>);</span><br><span class="line">list.add(<span class="number">12</span>);</span><br><span class="line"></span><br><span class="line">list.sort((o1, o2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (o1 == <span class="keyword">null</span> || o2 == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o1.compareTo(o2);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">System.out.println(list);</span><br></pre></td></tr></table></figure>
+<p>可以看到抛去null，12也在13的后面了，很明显排序出了问题。</p>
+<p>那么为什么会出现该问题呢？其实是由于排序算法的一些优化，比如讲x=y，y=z，那么就不会比较x和z的大小了，默认两个相等；x&gt;y,y&gt;z，那么也默认x&gt;z了。这些大大减少了比较的次数，加快了排序算法。但是在这种情况中，就会导致排序出现问题。</p>
+<p>可以debug进入sort方法中，看到转化为数组并使用了Arrays的排序算法。再进入，遗留的排序算法无需关注，直接进入TimSort类中，待续。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/24/linux文件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1522,141 +1648,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/equals/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/equals/" itemprop="url">equals</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T20:47:38+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>自反性：对于任何非空引用x，x.equals(x) 应该返回true。</li>
-<li>对称性：对于任何引用x和y，当且仅当y.equals(x)返回true，x.equals(y)也应该返回true。</li>
-<li>传递性：对于任何引用x、y和z，如果x.equals(y)返回true，y.equals(z)返回true，x.equals(z) 也应该返回true。</li>
-<li>一致性：如果x和y引用的对象没有发生变化，反复调用x.equals(y) 应该返回同样的结果。</li>
-<li>对于任意非空引用x，x.equals(null) 应该返回false。</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span> == obj) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (obj.getClass() != <span class="keyword">this</span>.getClass()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">//类型转化并判断属性是否相等</span></span><br><span class="line">    Test t = (Test) obj;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注意是class对象是否相等，如果是使用<code>instanceof</code>关键字的话，子类对象和父类对象不满足对称性，详细：</p>
-<ul>
-<li>如果子类能够拥有自己的相等概念，则对称性需求将强制采用getClass进行检测。</li>
-<li>如果由超类决定相等的概念，那么就可以使用instanceof进行检测，这样可以在不同子类的对象之间进行相等的比较，并且最好定义为final方法。</li>
-</ul>
-<p>如果在子类中重新定义equals，就要在其中包含调用super.equals(other)。</p>
-<p>Equals与hashCode的定义必须一致：如果x.equals(y)返回true，那么x.hashCode( )就必须与y.hashCode( )具有相同的值。</p>
-<p>如果存在数组类型的域，那么可以使用静态的Arrays.hashCode方法计算一个散列码，这个散列码由数组元素的散列码组成。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1711,7 +1702,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
