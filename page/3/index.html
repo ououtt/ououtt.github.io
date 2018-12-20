@@ -254,6 +254,143 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/java语法知识/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/04/java语法知识/" itemprop="url">java语法知识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T15:34:41+08:00">
+                2018-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Switch-String"><a href="#Switch-String" class="headerlink" title="Switch String"></a>Switch String</h2><p>switch支持String类型，实现原理是编译器进行转换：</p>
+<ol>
+<li>只有一个case语句：将其转换成一个if语句</li>
+<li>一个case和一个default语句：转换为if-else</li>
+<li>多个case：不变，仍然是case，但是string转换为hash值，并在case内部再通过String.equals做判断</li>
+</ol>
+<h2 id="二进制数值"><a href="#二进制数值" class="headerlink" title="二进制数值"></a>二进制数值</h2><p>0B或者0b的前缀表明是二进制数值，0B011001表示25</p>
+<h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><ul>
+<li>优先推荐使用非受检异常RuntimeException</li>
+<li>Throwable支持在构造方法中传入另一个异常作为参数，通过getCause方法获取</li>
+<li>在finally中抛出的异常会抑制本来需要抛出的异常，即上层只能看到finally中抛出的异常。通过java.lang.Throwable#addSuppressed方法可以将被抑制的异常类添加到list中被带出。通过源码可知该list初始化时通过java.util.Collections#unmodifiableList修饰为不可变list保证不会在不知情的情况下被添加类抑制异常，如果有添加被抑制异常类，则会再次初始化。</li>
+<li>catch多个相同处理方式的异常类，通过 | 分隔。这些一同被catch的异常不能相同且有子类关系时需保证子类在前。</li>
+</ul>
+<h2 id="try-with-resource"><a href="#try-with-resource" class="headerlink" title="try-with-resource"></a>try-with-resource</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(filePath))) &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>资源的申请在try语句中，释放则自动完成。如果出现异常，不论异常是在try中还是在资源的释放时，最终抛出的异常都是try中的异常，而如果有资源释放时发生的异常则会被添加进抛出异常的抑制异常列表，即被java.lang.Throwable#addSuppressed方法添加。</p>
+<p>try管理的资源需实现java.lang.AutoCloseable接口，否则会出现编译错误。I/O操作的java.io.Closeable接口已经实现该接口。</p>
+<p>在try-with-resource中也可以添加catch语句块，其中可以捕获try语句块和资源释放时发生的异常。</p>
+<p>try-with-resource可以管理多个资源。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/ThreadLocal/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -549,7 +686,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -562,7 +699,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
