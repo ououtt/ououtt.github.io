@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-08-14T14:51:51.280Z</updated>
+  <updated>2018-12-20T12:29:22.312Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>redis</title>
+    <link href="http://yoursite.com/2018/12/20/redis/"/>
+    <id>http://yoursite.com/2018/12/20/redis/</id>
+    <published>2018-12-20T12:28:45.000Z</published>
+    <updated>2018-12-20T12:29:22.312Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>采用预分配的方式减少内存的频繁分配，实际空间会大于实际字符串长度。SDS(Simple Dynamic String)</p><h2 id="list"><a href="#list" class="headerlink" title="list"></a>list</h2><p>redis在底层存储的list不是简单的linkedlist，而是称之为快速链表的quicklist。首先在列表元素较少的情况下会使用一块连续的内存存储，这个结构是ziplist，也称之为压缩列表，它将所有的元素紧挨着一起存储，分配的是一块连续的内存。当数据量较多时才会改成quicklist。因为普通的链表需要的附加指针空间太大，会比较浪费空间，而且会家中内存的碎片化。quicklist也就是将多个ziplist使用双向指针串起来，既能满足快速插入删除的性能，又不会出现太大的空间冗余。</p><h2 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h2><p>redis中的hash和java的HashMap是一致的，数组+链表，第一维数组位置碰撞就会将元素通过链表串起来(不过redis会有新旧两个)。不过redis的hash只能存储字符串，而且在rehash时会通过渐进式rehash同时保留新旧两个hash结构，查询时会同时查询两个hash结构。目的是rehash操作比较耗时，为了不阻塞服务。</p><h2 id="zset"><a href="#zset" class="headerlink" title="zset"></a>zset</h2><p>内部value是唯一的，每个value有一个score，代表这个value的排序权重，内部通过跳跃列表实现。</p><h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>不推荐。setnx(不存在才会插入) + ex(超市时间),还要注意值必须是随机数或者当前时间纳秒，释放锁时通过lua脚本对值进行判断然后删除。<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> redis.call(<span class="string">"get"</span>, KEY[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">return</span> redis.call(<span class="string">"del"</span>, KEYS[<span class="number">1</span>])</span><br></pre></td></tr></table></figure></p><p>不推荐去实现redis可重入锁。</p><h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>通过blpop(阻塞读)实现简单的消息队列。如果一直没有消息，服务端会断开连接，所以实现时还要注意捕获异常，还要重试。</p><h2 id="延时队列"><a href="#延时队列" class="headerlink" title="延时队列"></a>延时队列</h2><p>(DelayQueue/ScheduledThreadPoolExecutor)redis的延时队列可以通过zset实现。设置scope为到期时间，多线程轮训获取到期的value，通过zrem判断最终得到value的线程是哪个。</p><h2 id="位图"><a href="#位图" class="headerlink" title="位图"></a>位图</h2><p>setbit key offset value<br>getbit key offset<br>bitcount key start end 统计1的数量<br>bitpos key bit start end 范围内第一个指定的bit<br>此处的start和end必须是8的倍数！<br>bitfield</p><h2 id="HyperLogLog"><a href="#HyperLogLog" class="headerlink" title="HyperLogLog"></a>HyperLogLog</h2><p>不精确的去重计数方案。<br>pfadd/pdcount/pfmerge<br>redis进行了优化，在计数较小时采用稀疏矩阵存储，计数较大时转变成稠密矩阵，占用12k空间。12k是因为redis使用了16384个桶，每个桶的maxbits需要6个bits来存储，2^14*6/8=12k。</p><h2 id="布隆过滤器-BloomFilter"><a href="#布隆过滤器-BloomFilter" class="headerlink" title="布隆过滤器 BloomFilter"></a>布隆过滤器 BloomFilter</h2><p>需要使用插件安装。通过多个hash函数保证了不存在肯定是正确的，判断存在的话有一定误判率。为了保证误判率，需要考虑好初始大小和误判率两个参数。<br>bf.add 添加元素 bf.madd<br>bf.exists 查询元素是否存在 bf.mexists</p><h2 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h2><p>通过zset的score保留一个时间窗口，value保证不重复即可。</p><h3 id="漏斗限流"><a href="#漏斗限流" class="headerlink" title="漏斗限流"></a>漏斗限流</h3><p>redis-cell模块<br>cl.throttle key capacity count time quota<br>capacity初始容量<br>count/time漏水速率<br>quota默认1</p><h2 id="geohash"><a href="#geohash" class="headerlink" title="geohash"></a>geohash</h2><p>redis中经纬度使用52位的整数进行编码，放进来zset中，value是元素的key，score是geohash的52位整数值。<br>geoadd key lon lat value 添加一个坐标<br>geodist key value1 value2 unit(km) 计算两个坐标距离<br>geopos key value 返回经纬度坐标<br>georadiusbymember key value 20 km count 3 asc 返回指定值最近20km内最近的3个坐标(包含value自身)<br>georadius 查询指定坐标附近的点。</p><h2 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h2><p>不推荐PubSub。在5.0推出Stream。</p><h2 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h2><h2 id="过期"><a href="#过期" class="headerlink" title="过期"></a>过期</h2><p>redis会将所有设置了过期时间的key放入一个独立的map，然后通过定时遍历删除过期的key。定时遍历的算法描述如下：</p><ol><li>从过期map中随机20个key</li><li>删除当中过期的key</li><li>如果过期key比例超过1/4就重复步骤1<br>所以在客户端访问某个key的时候需要首先判断该key是否过期，已经过期就删除。</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;string&quot;&gt;&lt;a href=&quot;#string&quot; class=&quot;headerlink&quot; title=&quot;string&quot;&gt;&lt;/a&gt;string&lt;/h2&gt;&lt;p&gt;采用预分配的方式减少内存的频繁分配，实际空间会大于实际字符串长度。SDS(Simple Dynamic St
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>IO模型</title>
@@ -475,29 +496,6 @@
     
     
       <category term="java" scheme="http://yoursite.com/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一个有趣的类加载顺序</title>
-    <link href="http://yoursite.com/2018/04/11/%E4%B8%80%E4%B8%AA%E6%9C%89%E8%B6%A3%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F/"/>
-    <id>http://yoursite.com/2018/04/11/一个有趣的类加载顺序/</id>
-    <published>2018-04-11T08:44:44.000Z</published>
-    <updated>2018-04-12T12:40:56.722Z</updated>
-    
-    <content type="html"><![CDATA[<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        staticFunction();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> StaticTest st = <span class="keyword">new</span> StaticTest();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">"1"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(<span class="string">"2"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StaticTest() &#123;</span><br><span class="line">        System.out.println(<span class="string">"3"</span>);</span><br><span class="line">        System.out.println(<span class="string">"a="</span> + a + <span class="string">",b="</span> + b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"4"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">110</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> b = <span class="number">112</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>复制粘贴，在idea上一跑，先看看结果：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2</span><br><span class="line">3</span><br><span class="line">a=110,b=0</span><br><span class="line">1</span><br><span class="line">4</span><br></pre></td></tr></table></figure><p>仔细分析一下，加载StaticTest.class时，先按照顺序执行statis语句，但第一个statis语句是static StaticTest st = new StaticTest();,此时类还没加载完成，但是已经需要生成一个该类的对象，所以按照顺序执行非静态语句：打印2，给a赋值110，然后进入构造函数，打印3和a，b，注意b尚未被赋值，所以是初始化的值。然后才会执行余下的statis语句，打印2，给b赋值112，最后进入main方法打印4。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        staticFunction();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> StaticTest st = <span class="keyword">new</span> StaticTest();<span class="comment">//1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">"1"</span>);<span class="comment">//5</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(<span class="string">"2"</span>);<span class="comment">//2</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StaticTest() &#123;<span class="comment">//4</span></span><br><span class="line">        System.out.println(<span class="string">"3"</span>);</span><br><span class="line">        System.out.println(<span class="string">"a="</span> + a + <span class="string">",b="</span> + b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"4"</span>);<span class="comment">//6</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">110</span>;<span class="comment">//3</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> b = <span class="number">112</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=
-      
-    
-    </summary>
-    
-    
-      <category term="问题" scheme="http://yoursite.com/tags/%E9%97%AE%E9%A2%98/"/>
     
   </entry>
   

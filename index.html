@@ -254,6 +254,146 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/20/redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="gzm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avater.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/20/redis/" itemprop="url">redis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-20T20:28:45+08:00">
+                2018-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>采用预分配的方式减少内存的频繁分配，实际空间会大于实际字符串长度。SDS(Simple Dynamic String)</p>
+<h2 id="list"><a href="#list" class="headerlink" title="list"></a>list</h2><p>redis在底层存储的list不是简单的linkedlist，而是称之为快速链表的quicklist。首先在列表元素较少的情况下会使用一块连续的内存存储，这个结构是ziplist，也称之为压缩列表，它将所有的元素紧挨着一起存储，分配的是一块连续的内存。当数据量较多时才会改成quicklist。因为普通的链表需要的附加指针空间太大，会比较浪费空间，而且会家中内存的碎片化。quicklist也就是将多个ziplist使用双向指针串起来，既能满足快速插入删除的性能，又不会出现太大的空间冗余。</p>
+<h2 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h2><p>redis中的hash和java的HashMap是一致的，数组+链表，第一维数组位置碰撞就会将元素通过链表串起来(不过redis会有新旧两个)。不过redis的hash只能存储字符串，而且在rehash时会通过渐进式rehash同时保留新旧两个hash结构，查询时会同时查询两个hash结构。目的是rehash操作比较耗时，为了不阻塞服务。</p>
+<h2 id="zset"><a href="#zset" class="headerlink" title="zset"></a>zset</h2><p>内部value是唯一的，每个value有一个score，代表这个value的排序权重，内部通过跳跃列表实现。</p>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p>不推荐。setnx(不存在才会插入) + ex(超市时间),还要注意值必须是随机数或者当前时间纳秒，释放锁时通过lua脚本对值进行判断然后删除。<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> redis.call(<span class="string">"get"</span>, KEY[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">return</span> redis.call(<span class="string">"del"</span>, KEYS[<span class="number">1</span>])</span><br></pre></td></tr></table></figure></p>
+<p>不推荐去实现redis可重入锁。</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>通过blpop(阻塞读)实现简单的消息队列。如果一直没有消息，服务端会断开连接，所以实现时还要注意捕获异常，还要重试。</p>
+<h2 id="延时队列"><a href="#延时队列" class="headerlink" title="延时队列"></a>延时队列</h2><p>(DelayQueue/ScheduledThreadPoolExecutor)redis的延时队列可以通过zset实现。设置scope为到期时间，多线程轮训获取到期的value，通过zrem判断最终得到value的线程是哪个。</p>
+<h2 id="位图"><a href="#位图" class="headerlink" title="位图"></a>位图</h2><p>setbit key offset value<br>getbit key offset<br>bitcount key start end 统计1的数量<br>bitpos key bit start end 范围内第一个指定的bit<br>此处的start和end必须是8的倍数！<br>bitfield</p>
+<h2 id="HyperLogLog"><a href="#HyperLogLog" class="headerlink" title="HyperLogLog"></a>HyperLogLog</h2><p>不精确的去重计数方案。<br>pfadd/pdcount/pfmerge<br>redis进行了优化，在计数较小时采用稀疏矩阵存储，计数较大时转变成稠密矩阵，占用12k空间。12k是因为redis使用了16384个桶，每个桶的maxbits需要6个bits来存储，2^14*6/8=12k。</p>
+<h2 id="布隆过滤器-BloomFilter"><a href="#布隆过滤器-BloomFilter" class="headerlink" title="布隆过滤器 BloomFilter"></a>布隆过滤器 BloomFilter</h2><p>需要使用插件安装。通过多个hash函数保证了不存在肯定是正确的，判断存在的话有一定误判率。为了保证误判率，需要考虑好初始大小和误判率两个参数。<br>bf.add 添加元素 bf.madd<br>bf.exists 查询元素是否存在 bf.mexists</p>
+<h2 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h2><p>通过zset的score保留一个时间窗口，value保证不重复即可。</p>
+<h3 id="漏斗限流"><a href="#漏斗限流" class="headerlink" title="漏斗限流"></a>漏斗限流</h3><p>redis-cell模块<br>cl.throttle key capacity count time quota<br>capacity初始容量<br>count/time漏水速率<br>quota默认1</p>
+<h2 id="geohash"><a href="#geohash" class="headerlink" title="geohash"></a>geohash</h2><p>redis中经纬度使用52位的整数进行编码，放进来zset中，value是元素的key，score是geohash的52位整数值。<br>geoadd key lon lat value 添加一个坐标<br>geodist key value1 value2 unit(km) 计算两个坐标距离<br>geopos key value 返回经纬度坐标<br>georadiusbymember key value 20 km count 3 asc 返回指定值最近20km内最近的3个坐标(包含value自身)<br>georadius 查询指定坐标附近的点。</p>
+<h2 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h2><p>不推荐PubSub。在5.0推出Stream。</p>
+<h2 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h2><h2 id="过期"><a href="#过期" class="headerlink" title="过期"></a>过期</h2><p>redis会将所有设置了过期时间的key放入一个独立的map，然后通过定时遍历删除过期的key。定时遍历的算法描述如下：</p>
+<ol>
+<li>从过期map中随机20个key</li>
+<li>删除当中过期的key</li>
+<li>如果过期key比例超过1/4就重复步骤1<br>所以在客户端访问某个key的时候需要首先判断该key是否过期，已经过期就删除。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/14/IO模型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1441,204 +1581,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/java多线程介绍/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="gzm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avater.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="个人博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/15/java多线程介绍/" itemprop="url">java多线程介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T13:10:06+08:00">
-                2018-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念介绍"><a href="#概念介绍" class="headerlink" title="概念介绍"></a>概念介绍</h1><h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>Process是程序运行的实例,向操作系统申请资源(内存空间和文件句柄)基本单位.</p>
-<p><code>ps -ef</code> - 进程信息</p>
-<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>Thread是进程中可独立执行的最小单位.一个进程可以包含多个线程,同一个进程中的所有线程共享该进程中的资源.线程所要完成的计算就被称为任务,特定的线程总是在执行着特定的任务.</p>
-<h2 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h2><p>java平台中创建一个线程就是创建一个Thread或其子类,线程的任务逻辑在thread的run方法中,由虚拟机直接调用.但是,首先要启动线程,对应thread的start方法,具体何时运行是由线程调度器(Scheduler)决定的.</p>
-<p>创建thread的两种方式:1.继承thread并重写run方法 2.实现Runnable接口在run方法中实现任务逻辑并传给thread的构造函数.</p>
-<p>线程的run方法结束(正常结束或者异常退出),内存对象也会被虚拟机回收.并且线程的start方法只能被调用一次,多次调用会返回IllegalThreadStateException.</p>
-<p>创建一个线程对象与其他对象不同的是,java虚拟机会为每个线程分配调用栈(Call Stack)所需的内存空间.调用栈用于跟踪java代码间的调用关系以及java对本地代码(Native Code)的调用,另外java平台的每个线程可能还有一个内核线程与之对应.</p>
-<p><code>Thread.currentThread()</code> - 返回当前线程</p>
-<h2 id="Runnable"><a href="#Runnable" class="headerlink" title="Runnable"></a>Runnable</h2><p>Thread是Runnable接口的一个实现类,重写的run方法如下:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (target != <span class="keyword">null</span>) &#123;</span><br><span class="line">        target.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其中,target是一个Runnable对象,第二个创建线程的方法会把构造函数传入的Runnable对象用target保存起来.</p>
-<p>由于java是单继承的,并且组合也比继承更灵活,因此一般而言,使用第二种创建线程的方法.</p>
-<p><code>Runtime.getRuntime.availableProcessors()</code> - 获取处理器个数</p>
-<h2 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h2><p>线程的编号(ID),名称(name),线程的类别(Daemon)和优先级(Priority).</p>
-<ul>
-<li>ID</li>
-</ul>
-<p>long,用于标识不同的线程,该属性在运行结束后可能被后续创建的线程使用</p>
-<ul>
-<li>name</li>
-</ul>
-<p>String,面向用户的一个属性,不保证唯一.</p>
-<ul>
-<li>Deamon</li>
-</ul>
-<p>boolean,true表示为守护线程,该属性的默认值与父线程相同,且必须在start方法之前设置.用户线程会阻止虚拟机的正常停止,即有用户线程在运行时,虚拟机不会正常停止,但是守护线程不会影响java虚拟机的正常停止,用于执行一些重要性不是很高的任务.</p>
-<p>java虚拟机的正常停止指不是通过System.exit也不是通过强制终止进程(kill).</p>
-<ul>
-<li>Priority</li>
-</ul>
-<p>int,java定义了1-10的10个优先级,默认值为5(表示普通优先级).对于具体的一个线程而言,其优先级的默认值和父线程相同.该值设置不当会产生线程饥饿(Thread Starvation).</p>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><p><code>static Thread currentThread()</code> - 返回当前线程</p>
-<p><code>void run()</code> - 线程任务逻辑代码</p>
-<p><code>void start()</code> - 启动相应线程,不保证已经被启动和一定会启动</p>
-<p><code>void join()</code> - 等待相应线程运行结束,若A线程调用<strong><em>B</em></strong>线程的join方法,那么线程A会暂停直到B线程运行结束</p>
-<p><code>static void yield()</code> - 使当前线程主动放弃其对处理器的占用,该方法被调用时当前线程可能仍然继续运行</p>
-<p><code>static void sleep(long millis)</code> - 休眠指定的时间</p>
-<h2 id="线程的层次关系"><a href="#线程的层次关系" class="headerlink" title="线程的层次关系"></a>线程的层次关系</h2><p>父子关系:创建线程的当前线程是被创建的线程的父线程.</p>
-<h2 id="java-lang-Thread-State-enum"><a href="#java-lang-Thread-State-enum" class="headerlink" title="java.lang.Thread.State(enum)"></a>java.lang.Thread.State(enum)</h2><p>可以通过Thread.getState()获取.</p>
-<ul>
-<li>new</li>
-</ul>
-<p>一个已经创建但是未启动的线程处于该状态,一个线程只可能有一次处于该状态</p>
-<ul>
-<li>runnable</li>
-</ul>
-<p>包括两个子状态:ready和running.ready表示可以被线程调度器调度而进入running状态,也被称为活跃线程.running表示正在运行,调用yield方法可能会转换为ready.</p>
-<ul>
-<li>blocked</li>
-</ul>
-<p>一个线程发起一个阻塞式io或者申请一个已经被其他线程持有的独占资源(锁),线程处于该状态,此时线程不会占用处理器资源,当io操作或者或者锁时,可以转化为runnable</p>
-<ul>
-<li>waiting</li>
-</ul>
-<p>使线程变为wating状态的方法:Object.wait(),Thread.join(),LockSupport.park(Object)</p>
-<p>从waiting转化为runnable的方法:Object.notify()和notifyAll(),LockSupport.unpark(Object)</p>
-<ul>
-<li>timed_waiting</li>
-</ul>
-<p>和waiting的区别就是指定时间结束后,该线程会自动转化为runnable</p>
-<ul>
-<li>terminated</li>
-</ul>
-<p>结束运行的线程处于该状态,每个线程也只会有一次处于该状态</p>
-<h2 id="jvisualvm"><a href="#jvisualvm" class="headerlink" title="jvisualvm"></a>jvisualvm</h2><p>java提供的jvm监视工具</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
-<li>提高系统吞吐率</li>
-<li>提高响应性</li>
-<li>充分利用多核处理器资源</li>
-<li>最小化对系统资源的使用</li>
-<li>简化程序的机构</li>
-</ol>
-<h2 id="风险"><a href="#风险" class="headerlink" title="风险"></a>风险</h2><ol>
-<li>线程安全问题</li>
-<li>线程活跃性问题</li>
-<li>上下文切换</li>
-<li>可靠性</li>
-</ol>
-<p><img src="/2018/04/15/java多线程介绍/介绍.png" alt="介绍"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1693,7 +1635,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
